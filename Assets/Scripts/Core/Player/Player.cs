@@ -14,22 +14,27 @@ public class Player : MonoBehaviour
     private List<Transform> _waypoints;
     private NavMeshAgent _navMeshAgent;
     private Animator _animator;
+    
+    private MouseInputSystem _mouseInputSystem;
     private int _currentIndex;
 
     private bool _canMove;
     private bool _isMoving = true;
+    private bool _isConstruct;
     
     [Inject]
-    public void Construct(CinemachineFreeLook virtualCamera, List<Transform> waypoints)
+    public void Construct(CinemachineFreeLook virtualCamera, List<Transform> waypoints, MouseInputSystem mouseInputSystem)
     {
         _freeLockCamera = virtualCamera;
         _freeLockCamera.Follow = transform;
         _freeLockCamera.LookAt = transform;
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
+        _mouseInputSystem = mouseInputSystem;
         _waypoints = waypoints;
         _canMove = true;
         _isMoving = false;
+        _isConstruct = true;
     }
     
     
@@ -39,7 +44,8 @@ public class Player : MonoBehaviour
         {
             TryMoveToNextWaypoint();
         }
-
+        if(_isConstruct)
+            _mouseInputSystem.Tick();
         if (Input.GetKeyDown(KeyCode.G) && !_canMove && !_isMoving)
         {
             _canMove = true;
@@ -53,6 +59,7 @@ public class Player : MonoBehaviour
 
         _isMoving = true;
         _canMove = false;
+        _mouseInputSystem.Disable();
         _animator.SetBool( IsRun, true );
 
         Transform target = _waypoints[_currentIndex];
@@ -69,6 +76,7 @@ public class Player : MonoBehaviour
         }
 
         _isMoving = false;
+        _mouseInputSystem.Enable();
         _animator.SetBool( IsRun, false );
         _currentIndex++;
     }

@@ -1,3 +1,4 @@
+using Infrastructure.DI.Container;
 using Infrastructure.DI.Injector;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ public class EnemyFactory : IFactory
     
     [Inject] private EnemyConfig _enemyConfig;
     [Inject] private AssetLoader _assetLoader;
+    [Inject] private Container _container;
 
     public GameObject Create(Vector3 position, Transform parent)
     {
@@ -15,6 +17,8 @@ public class EnemyFactory : IFactory
             return null;
 
         var instance = GameObject.Instantiate(prefab, position, Quaternion.identity, parent);
+        var enemyComponent = instance.GetComponent<Enemy>();
+        _container.Construct(enemyComponent);
         return instance;
     }
 }

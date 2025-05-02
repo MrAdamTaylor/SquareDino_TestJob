@@ -16,8 +16,11 @@ public class PlayerFactory : IFactory
         if (prefab == null)
             return null;
 
-        var instance = GameObject.Instantiate(prefab, position, Quaternion.identity, parent);
+        var instance = GameObject.Instantiate(prefab, position, Quaternion.Euler(0,180,0), parent);
         var playerComponent = instance.GetComponent<Player>();
+        MouseInputSystem mouseInputSystem = new();
+        _container.Construct(mouseInputSystem);
+        _container.CacheType(mouseInputSystem.GetType(), mouseInputSystem);
         _container.Construct(playerComponent);
         return instance;
     }

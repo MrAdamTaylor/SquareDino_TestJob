@@ -4,6 +4,7 @@ namespace Infrastructure.DI.Container
     {
         Default,
         Mono,
+        Component,
         Scriptable
     }
 }

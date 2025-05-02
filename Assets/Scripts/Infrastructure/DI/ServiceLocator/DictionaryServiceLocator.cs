@@ -60,4 +60,26 @@ namespace Infrastructure.DI.ServiceLocator
 
         public bool IsGetData(Type type) => _monoDict.ContainsKey(type);
     }
+    
+    public class ComponentDictionaryServiceLocator : IServiceLocator
+    {
+        private static readonly Dictionary<Type, Component> _componentDictionary = new();
+
+
+        public void BindData(Type type, object obj)
+        {
+            if (obj is Component mono)
+            {
+                _componentDictionary[type] = mono;
+            }
+            else
+            {
+                Debug.LogWarning($"Object {obj} is not Component");
+            }
+        }
+
+        public object GetData(Type type) => _componentDictionary[type];
+
+        public bool IsGetData(Type type) => _componentDictionary.ContainsKey(type);
+    }
 }

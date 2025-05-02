@@ -7,15 +7,18 @@ namespace Infrastructure.DI.Container
         private readonly IServiceLocator _defaultLocator;
         private readonly IServiceLocator _monoLocator;
         private readonly IServiceLocator _scriptableLocator;
+        private readonly IServiceLocator _componentsLocator;
         
         public ServiceLocatorProvider(
             IServiceLocator defaultLocator = null,
             IServiceLocator monoLocator = null,
-            IServiceLocator scriptableLocator = null)
+            IServiceLocator scriptableLocator = null,
+            IServiceLocator componentLocator = null)
         {
             _defaultLocator = defaultLocator ?? new DictionaryServiceLocator();
             _monoLocator = monoLocator ?? new MonoDictionaryServiceLocator();
             _scriptableLocator = scriptableLocator ?? new DictionaryServiceLocator();
+            _componentsLocator = componentLocator ?? new ComponentDictionaryServiceLocator();
         }
         
         public IServiceLocator GetLocator(LocatorType type)
@@ -24,6 +27,7 @@ namespace Infrastructure.DI.Container
             {
                 LocatorType.Mono => _monoLocator,
                 LocatorType.Scriptable => _scriptableLocator,
+                LocatorType.Component => _componentsLocator,
                 _ => _defaultLocator,
             };
         }
@@ -31,6 +35,7 @@ namespace Infrastructure.DI.Container
         public IServiceLocator Default => _defaultLocator;
         public IServiceLocator Mono => _monoLocator;
         public IServiceLocator Scriptable => _scriptableLocator;
+        public IServiceLocator Component => _componentsLocator;
         
     }
 }

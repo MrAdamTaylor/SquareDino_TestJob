@@ -128,6 +128,11 @@ namespace Infrastructure.DI.Container
             _locatorProvider.Mono.BindData(type, instance);
         }
 
+        public void CacheComponent<T>(Type componentType, T instance) where T : Component
+        {
+            _locatorProvider.Component.BindData(componentType, instance);
+        }
+
         public void CacheScriptableObject<T>(Type type, T instance) where T : ScriptableObject
         {
             _locatorProvider.Scriptable.BindData(type, instance);

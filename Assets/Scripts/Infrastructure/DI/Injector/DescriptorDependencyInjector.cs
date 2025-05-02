@@ -127,6 +127,13 @@ namespace Infrastructure.DI.Injector
                     service = _locatorProvider.Scriptable.GetData(type);
                 }
             }
+            else if (typeof(Component).IsAssignableFrom(type))
+            {
+                if (_locatorProvider.Component.IsGetData(type))
+                {
+                    service = _locatorProvider.Component.GetData(type);
+                }
+            }
             else
             {
                 if (_locatorProvider.Default.IsGetData(type))
