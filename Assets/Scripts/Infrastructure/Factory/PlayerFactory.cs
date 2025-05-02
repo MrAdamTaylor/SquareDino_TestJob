@@ -1,3 +1,4 @@
+using Infrastructure.DI.Container;
 using Infrastructure.DI.Injector;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ public class PlayerFactory : IFactory
     
     [Inject] private PlayerConfig _playerConfig;
     [Inject] private AssetLoader _assetLoader;
+    [Inject] private Container _container;
     
     public GameObject Create(Vector3 position, Transform parent)
     {
@@ -15,6 +17,8 @@ public class PlayerFactory : IFactory
             return null;
 
         var instance = GameObject.Instantiate(prefab, position, Quaternion.identity, parent);
+        var playerComponent = instance.GetComponent<Player>();
+        _container.Construct(playerComponent);
         return instance;
     }
 }
