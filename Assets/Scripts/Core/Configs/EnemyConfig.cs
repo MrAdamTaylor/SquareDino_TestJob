@@ -1,7 +1,10 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Enemy", menuName = "Enemy")]
-public class EnemyConfig : ScriptableObject
+namespace Core.Configs
 {
-    public int Health;
+    [CreateAssetMenu(fileName = "Enemy", menuName = "Enemy")]
+    public class EnemyConfig : ScriptableObject
+    {
+        public int Health;
+    }
 }

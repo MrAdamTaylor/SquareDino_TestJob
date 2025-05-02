@@ -1,6 +1,9 @@
 using UnityEngine;
 
-public interface IFactory
+namespace Infrastructure.Factory
 {
-    public GameObject Create(Vector3 position, Transform parent);
+    public interface IFactory
+    {
+        public GameObject Create(Vector3 position, Transform parent);
+    }
 }

@@ -1,29 +1,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RagdollHandler 
+namespace Core.Enemy
 {
-    private List<Rigidbody> _rigidbodies;
-
-    public void Initialize(Rigidbody[] rigidbodies)
+    public class RagdollHandler 
     {
-        _rigidbodies = new List<Rigidbody>(rigidbodies);
-        Disable();
-    }
+        private List<Rigidbody> _rigidbodies;
 
-    public void Enable()
-    {
-        for (int i = 0; i < _rigidbodies.Count; i++)
+        public void Initialize(Rigidbody[] rigidbodies)
         {
-            _rigidbodies[i].isKinematic = false;
+            _rigidbodies = new List<Rigidbody>(rigidbodies);
+            Disable();
         }
-    }
 
-    public void Disable()
-    {
-        for (int i = 0; i < _rigidbodies.Count; i++)
+        public void Enable()
         {
-            _rigidbodies[i].isKinematic = true;
+            for (int i = 0; i < _rigidbodies.Count; i++)
+            {
+                _rigidbodies[i].isKinematic = false;
+            }
+        }
+
+        public void Disable()
+        {
+            for (int i = 0; i < _rigidbodies.Count; i++)
+            {
+                _rigidbodies[i].isKinematic = true;
+            }
         }
     }
 }

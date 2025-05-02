@@ -1,17 +1,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class TransformExtensions
+namespace Extensions
 {
-    public static List<Transform> GetAllChildren(this Transform parent)
+    public static class TransformExtensions
     {
-        List<Transform> children = new List<Transform>();
-
-        for (int i = 0; i < parent.childCount; i++)
+        public static List<Transform> GetAllChildren(this Transform parent)
         {
-            children.Add(parent.GetChild(i));
-        }
+            List<Transform> children = new List<Transform>();
 
-        return children;
+            for (int i = 0; i < parent.childCount; i++)
+            {
+                children.Add(parent.GetChild(i));
+            }
+
+            return children;
+        }
     }
 }

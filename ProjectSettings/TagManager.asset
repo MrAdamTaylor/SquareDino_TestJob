@@ -3,12 +3,14 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - CameraLook
+  - EnemySpawner
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - EditorCustom
   - Water
   - UI
   - 

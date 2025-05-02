@@ -1,7 +1,10 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Way", menuName = "Way")]
-public class WayConfig : ScriptableObject
+namespace Core.Configs
 {
+    [CreateAssetMenu(fileName = "Way", menuName = "Way")]
+    public class WayConfig : ScriptableObject
+    {
     
+    }
 }

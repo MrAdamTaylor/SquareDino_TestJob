@@ -1,6 +1,9 @@
 using UnityEngine;
 
-public interface IAssetLoader
+namespace Infrastructure.Factory
 {
-    GameObject LoadPrefab(string path);
+    public interface IAssetLoader
+    {
+        GameObject LoadPrefab(string path);
+    }
 }

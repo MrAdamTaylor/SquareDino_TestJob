@@ -1,36 +1,37 @@
-using System;
+using Core.Configs;
+using Core.UI;
 using Infrastructure.DI.Injector;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+namespace Core.Enemy
 {
-    private Animator _animator;
-    private Health _health;
-    private RagdollHandler _ragdollHandler;
+    public class Enemy : MonoBehaviour, IDamagable
+    {
+        [SerializeField] private HealthView _healthView;
     
-    [Inject]
-    public void Construct(Health health,RagdollHandler ragdollHandler)
-    {
-        _animator = GetComponent<Animator>();
-        _health = health;
-        _ragdollHandler = ragdollHandler;
-        _ragdollHandler.Initialize(GetComponentsInChildren<Rigidbody>());
+        private Animator _animator;
+        private HealthController _healthController;
+        private RagdollHandler _ragdollHandler;
+    
+        [Inject]
+        public void Construct(Health health,RagdollHandler ragdollHandler, EnemyConfig enemyConfig)
+        {
+            _animator = GetComponent<Animator>();
+            health.Construct(enemyConfig.Health);
+            _healthController = new HealthController(health, _healthView, Kill);
+            _ragdollHandler = ragdollHandler;
+            _ragdollHandler.Initialize(GetComponentsInChildren<Rigidbody>());
+        }
+
+        private void Kill()
+        {
+            _animator.enabled = false;
+            _ragdollHandler.Enable();
+        }
+
+        public void TakeDamage(int damage)
+        {
+            _healthController.TakeDamage(damage);
+        }
     }
-
-
-    public void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.L))
-            Kill();
-    }
-
-    private void Kill()
-    {
-        _animator.enabled = false;
-        _ragdollHandler.Enable();
-    }
-}
-
-public class Health
-{
 }

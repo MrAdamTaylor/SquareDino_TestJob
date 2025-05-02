@@ -1,21 +1,24 @@
-using System.Collections;
 using Infrastructure.DI.Container;
+using Infrastructure.StateMachine;
 using UnityEngine;
 
-public class GameAppController : MonoBehaviour
+namespace Infrastructure
 {
-    private GameStateMachine _gameStateMachine;
-    public void Init(Container container)
+    public class GameAppController : MonoBehaviour
     {
-        _gameStateMachine = new GameStateMachine(container);
-        _gameStateMachine.Enter<InitState>();
+        private GameStateMachine _gameStateMachine;
+        public void Init(Container container)
+        {
+            _gameStateMachine = new GameStateMachine(container);
+            _gameStateMachine.Enter<InitState>();
         
+        }
     }
-}
 
 
-public interface IState
-{
-    void Enter();
-    void Exit();
+    public interface IState
+    {
+        void Enter();
+        void Exit();
+    }
 }

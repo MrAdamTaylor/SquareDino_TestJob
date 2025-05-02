@@ -1,36 +1,38 @@
-
-
+using Core.ObjectPool;
 using Infrastructure.DI.Injector;
 using UnityEngine;
 
-public class MouseInputSystem 
+namespace Core.Player
 {
-    private Camera _camera;
-    //private readonly IBulletSpawner _bulletSpawner;
-    private bool _isEnabled;
-
-    [Inject]
-    public void Construct(Camera camera)
+    public class MouseInputSystem 
     {
-        _camera = camera;
-        //_bulletSpawner = bulletSpawner;
-        _isEnabled = true;
-    }
+        private Camera _camera;
+        private  BulletPool _bulletPool;
+        private bool _isEnabled;
 
-    public void Tick()
-    {
-        if (!_isEnabled)
-            return;
-
-        if (Input.GetMouseButtonDown(0)) 
+        [Inject]
+        public void Construct(Camera camera, BulletPool bulletPool)
         {
-            Vector3 screenPos = Input.mousePosition;
-            Ray ray = _camera.ScreenPointToRay(screenPos);
-            Debug.Log("Clicked");
-            //_bulletSpawner.Spawn(_camera.transform.position, Quaternion.LookRotation(ray.direction));
+            _camera = camera;
+            _bulletPool = bulletPool;
+            _isEnabled = true;
         }
-    }
 
-    public void Enable()  => _isEnabled = true;
-    public void Disable() => _isEnabled = false;
+        public void Tick()
+        {
+            if (!_isEnabled)
+                return;
+
+            if (Input.GetMouseButtonDown(0)) 
+            {
+                Vector3 screenPos = Input.mousePosition;
+                Ray ray = _camera.ScreenPointToRay(screenPos);
+                Debug.Log("Clicked");
+                _bulletPool.Spawn(_camera.transform.position, Quaternion.LookRotation( ray.direction ));
+            }
+        }
+
+        public void Enable()  => _isEnabled = true;
+        public void Disable() => _isEnabled = false;
+    }
 }

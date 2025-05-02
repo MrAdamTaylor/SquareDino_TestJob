@@ -1,9 +1,12 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Player", menuName = "Player")]
-public class PlayerConfig : ScriptableObject
+namespace Core.Configs
 {
-    public int Health;
-    public int Speed;
-    public int Damage;
+    [CreateAssetMenu(fileName = "Player", menuName = "Player")]
+    public class PlayerConfig : ScriptableObject
+    {
+        public int Health;
+        public int Speed;
+        public int Damage;
+    }
 }

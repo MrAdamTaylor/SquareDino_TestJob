@@ -1,15 +1,18 @@
 using UnityEngine;
 
-public class AssetLoader : IAssetLoader
+namespace Infrastructure.Factory
 {
-    public GameObject LoadPrefab(string path)
+    public class AssetLoader : IAssetLoader
     {
-        var prefab = Resources.Load<GameObject>(path);
-        if (prefab == null)
+        public GameObject LoadPrefab(string path)
         {
-            Debug.LogError($"Not found prefab by path '{path}'");
-            return null;
+            var prefab = Resources.Load<GameObject>(path);
+            if (prefab == null)
+            {
+                Debug.LogError($"Not found prefab by path '{path}'");
+                return null;
+            }
+            return prefab;
         }
-        return prefab;
     }
 }

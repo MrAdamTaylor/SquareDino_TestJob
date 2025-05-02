@@ -1,14 +1,17 @@
 using System;
 
-public class GameLoopState : IState
+namespace Infrastructure.StateMachine
 {
-    public void Enter()
+    public class GameLoopState : IState
     {
-        throw new NotImplementedException();
-    }
+        public void Enter()
+        {
+            throw new NotImplementedException();
+        }
 
-    public void Exit()
-    {
-        throw new NotImplementedException();
+        public void Exit()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
