@@ -17,7 +17,7 @@ namespace Core.GameControll
 
         public Transform StartPoint { get; }
         
-        private int _completedSteps = 0;
+        private bool _isFinished;
 
         private GameStateMachine _gameStateMachine;
         private Queue<Transform> _waypoints;
@@ -39,12 +39,12 @@ namespace Core.GameControll
 
         public void StartConfigure()
         {
-            _completedSteps = 0;
             _enemyManager.ReloadAllEnemies();
             _mouseInputSystem.Enable();
             _mouseInputSystem.StartConfigure();
             _mouseInputSystem.OnFirstClick += EnterGameLoop;
             _player.ConfigureBeforeStart();
+            _isFinished = false;
         }
 
         public void GameStart()
@@ -94,11 +94,12 @@ namespace Core.GameControll
         private void NextStep()
         {
             _currentTask.OnCompleted -= NextStep;
-
-            _completedSteps++;
+            
+            if(_tasks.Count == 0)
+                _isFinished = true;
             
             if(_gameTasks.Count - _tasks.Count > 1)
-                _enemyManager.OnTaskCompleted(_completedSteps);
+                _enemyManager.OnTaskCompleted(_isFinished);
             AssignNextTask();
         }
 

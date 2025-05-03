@@ -11,8 +11,8 @@ namespace Core.Enemy
 
         public IReadOnlyList<Enemy> ActiveEnemies => _activeEnemies;
         
-        private List<GameObject> _ragdollEnemiesList = new();
-        private List<Enemy> _activeEnemies = new();
+        private readonly List<GameObject> _ragdollEnemiesList = new();
+        private readonly List<Enemy> _activeEnemies = new();
         private List<GameObject> _oldRagdollEnemiesList = new();
 
         public void SpawnEnemies(Transform[] enemiesPoints)
@@ -25,22 +25,19 @@ namespace Core.Enemy
             }
         }
 
-        public void OnTaskCompleted(int stepNumber)
+        public void OnTaskCompleted(bool isFinished)
         {
-            if (stepNumber < 2)
-            {
-                return; 
-            }
-            
             for (int i = 0; i < _oldRagdollEnemiesList.Count; i++)
             {
                 ReturnEnemyInPool(_oldRagdollEnemiesList[i]);
             }
             _oldRagdollEnemiesList.Clear();
             
-            _oldRagdollEnemiesList = new List<GameObject>(_ragdollEnemiesList);
-            
-            _ragdollEnemiesList.Clear();
+            if (!isFinished)
+            {
+                _oldRagdollEnemiesList = new List<GameObject>(_ragdollEnemiesList);
+                _ragdollEnemiesList.Clear();
+            }
         }
 
         public void ReloadAllEnemies()
@@ -58,8 +55,7 @@ namespace Core.Enemy
                     ReturnEnemyInPool(_activeEnemies[i].gameObject);
                 _activeEnemies.Clear();
             }
-
-
+            
             if ( _ragdollEnemiesList.Count > 0)
             {
                 for (int i = 0; i < _ragdollEnemiesList.Count; i++) 
@@ -70,18 +66,12 @@ namespace Core.Enemy
 
         private void ReturnEnemyInPool(GameObject enemyObject)
         {
-            if (enemyObject.TryGetComponent(out Enemy enemy))
-            {
-                enemy.OnDeath -= HandleEnemyDeath;
-                enemy.Recovery();
-            }
-
             _enemyPool.Return(enemyObject);
         }
 
-        private void SubscribeToDeath(GameObject enemyGO)
+        private void SubscribeToDeath(GameObject enemySubscriber)
         {
-            if (enemyGO.TryGetComponent(out Enemy enemy))
+            if (enemySubscriber.TryGetComponent(out Enemy enemy))
             {
                 enemy.OnDeath += HandleEnemyDeath;
                 _activeEnemies.Add(enemy);
@@ -90,6 +80,7 @@ namespace Core.Enemy
         
         private void HandleEnemyDeath(Enemy enemy)
         {
+            enemy.OnDeath -= HandleEnemyDeath;
             _ragdollEnemiesList.Add(enemy.gameObject);
             _activeEnemies.Remove(enemy);
         }
