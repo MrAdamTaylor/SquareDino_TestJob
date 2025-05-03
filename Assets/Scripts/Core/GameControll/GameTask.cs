@@ -1,28 +1,31 @@
 using System;
 using System.Collections.Generic;
-using Core.Enemy;
 using UnityEngine;
 
-namespace Infrastructure.StateMachine
+namespace Core.GameControll
 {
     public class GameTask
     {
-        private Transform _cameraLookTarget;
-        private List<Transform> _enemySpawnPoints;
-        private int _purposeCount;
-        private int _currentKills;
-        
         public event Action OnCompleted;
+        
+        public int EnemyCount => _enemySpawnPoints.Count;
+        public Transform[] GetPositions() => _enemySpawnPoints.ToArray();
+        
+        private List<Transform> _enemySpawnPoints;
+        private readonly int _purposeCount;
+        private int _currentKills;
 
-        public GameTask(Transform cameraLookTarget, List<Transform> enemySpawnPoints)
+        public GameTask( List<Transform> enemySpawnPoints)
         {
-            _cameraLookTarget = cameraLookTarget;
             _enemySpawnPoints = enemySpawnPoints;
             _purposeCount = enemySpawnPoints.Count;
             _currentKills = 0;
         }
-        
-        public void AttachEnemy(Enemy enemy)
+        public void Reset()
+        {
+            _currentKills = 0;
+        }
+        public void AttachEnemy(Enemy.Enemy enemy)
         {
 
             if (enemy.IsDeath)
@@ -33,8 +36,7 @@ namespace Infrastructure.StateMachine
 
             enemy.OnDeath += OnEnemyKilled;
         }
-
-        private void OnEnemyKilled(Enemy enemy)
+        private void OnEnemyKilled(Enemy.Enemy enemy)
         {
             enemy.OnDeath -= OnEnemyKilled; 
 
@@ -42,17 +44,7 @@ namespace Infrastructure.StateMachine
             if (_currentKills >= _purposeCount)
             {
                 OnCompleted?.Invoke(); 
-                //OnCompleted = null;    
             }
-        }
-    
-        public int EnemyCount => _enemySpawnPoints.Count;
-
-        public Transform[] GetPositions() => _enemySpawnPoints.ToArray();
-
-        public void Reset()
-        {
-            _currentKills = 0;
         }
     }
 }

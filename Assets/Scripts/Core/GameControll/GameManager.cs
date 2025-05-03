@@ -1,22 +1,24 @@
 using System.Collections.Generic;
 using System.Linq;
+using Core.Enemy;
 using Core.Player;
 using Infrastructure.DI.Injector;
+using Infrastructure.StateMachine;
 using UnityEngine;
 
-namespace Infrastructure.StateMachine
+namespace Core.GameControll
 {
     public class GameManager
     {
-        private int _completedSteps = 0;
-        
         [Inject] private EnemyManager _enemyManager;
         [Inject] private List<(Transform,GameTask)> _gameTasks;
         [Inject] private MouseInputSystem _mouseInputSystem;
-        [Inject] private Player _player;
+        [Inject] private Player.Player _player;
+
+        public Transform StartPoint { get; }
         
-        public Transform StartPoint { get; private set; }
-        
+        private int _completedSteps = 0;
+
         private GameStateMachine _gameStateMachine;
         private Queue<Transform> _waypoints;
         private Queue<GameTask> _tasks;
@@ -35,6 +37,16 @@ namespace Infrastructure.StateMachine
             _gameStateMachine = gameStateMachine;
         }
 
+        public void StartConfigure()
+        {
+            _completedSteps = 0;
+            _enemyManager.ReloadAllEnemies();
+            _mouseInputSystem.Enable();
+            _mouseInputSystem.StartConfigure();
+            _mouseInputSystem.OnFirstClick += EnterGameLoop;
+            _player.ConfigureBeforeStart();
+        }
+
         public void GameStart()
         {
             _tasks = new Queue<GameTask>(_gameTasks.Select(t => t.Item2));
@@ -43,13 +55,23 @@ namespace Infrastructure.StateMachine
             AssignNextTask();
         }
 
-        
+        public void ReloadGame()
+        {
+            _player.PlayerStop();
+            _player.gameObject.transform.position = StartPoint.position;
+            for (int i = 0; i < _gameTasks.Count; i++)
+            {
+                _gameTasks[i].Item2.Reset();
+            }
+
+            _gameStateMachine.Enter<OnStartState>();
+        }
+
         private void AssignNextTask()
         {
             if (_tasks.Count == 0)
             {
                 _currentTask.OnCompleted -= NextStep;
-                Debug.Log("<color=green>All tasks completed</color>");
                 _player.TryMoveToNextWaypoint(_levelReloaderTrigger.gameObject.transform);
                 return;
             }
@@ -67,10 +89,7 @@ namespace Infrastructure.StateMachine
             {
                 _currentTask.AttachEnemy(activeEnemies[i]);
             }
-
-            Debug.Log($"<color=cyan>Task assigned {_completedSteps}</color>");
         }
-        
         
         private void NextStep()
         {
@@ -83,32 +102,10 @@ namespace Infrastructure.StateMachine
             AssignNextTask();
         }
 
-        public void StartConfigure()
-        {
-            _completedSteps = 0;
-            _enemyManager.ReloadAllEnemies();
-            _mouseInputSystem.Enable();
-            _mouseInputSystem.StartConfigure();
-            _mouseInputSystem.OnFirstClick += EnterGameLoop;
-            _player.ConfigureBeforeStart();
-        }
-
         private void EnterGameLoop()
         {
             _mouseInputSystem.OnFirstClick -= EnterGameLoop;
             _gameStateMachine.Enter<GameLoopState>();
-        }
-
-        public void ReloadGame()
-        {
-            _player.PlayerStop();
-            _player.gameObject.transform.position = StartPoint.position;
-            for (int i = 0; i < _gameTasks.Count; i++)
-            {
-                _gameTasks[i].Item2.Reset();
-            }
-
-            _gameStateMachine.Enter<OnStartState>();
         }
     }
 }

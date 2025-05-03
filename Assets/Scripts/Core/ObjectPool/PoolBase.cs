@@ -31,11 +31,6 @@ namespace Core.ObjectPool
                 Return(preloadFunc());
         }
 
-        public int GetUnpooledCount()
-        {
-            return _poolMaximum - PoolCount;
-        }
-
         public T Get()
         {
             T item = _pool.Count > 0 ? _pool.Dequeue() : throw new Exception("Pool Not Have Objects");
@@ -54,9 +49,5 @@ namespace Core.ObjectPool
             PoolCount++;
         }
 
-        public void ReturnAll()
-        {
-            foreach (T item in _active.ToArray()) Return(item);
-        }
     }
 }

@@ -8,6 +8,8 @@ namespace Core.Enemy
         private int _current;
         private int _max;
 
+        public float Normalized => (float)_current / _max;
+
         public void Construct(int max)
         {
             _max = max;
@@ -19,8 +21,6 @@ namespace Core.Enemy
             _current -= damage;
             _current = Mathf.Max(_current, 0);
         }
-
-        public float Normalized => (float)_current / _max;
 
         public void RestoreHealth()
         {

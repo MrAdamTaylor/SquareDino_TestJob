@@ -5,25 +5,39 @@ using Core.ObjectPool;
 using Infrastructure.DI.Injector;
 using UnityEngine;
 
-namespace Core
+namespace Core.Other
 {
     public class Bullet : MonoBehaviour
     {
-        private bool _isConstructed;
-
         private BulletConfig _config;
         private BulletPool _bulletPool;
         private Vector3 Direction	=> transform.forward;
-        Coroutine _lifetimeCor;
-        void OnEnable()		=> _lifetimeCor = StartCoroutine( Lifetime_Cor() );
-        void OnDisable()	=> StopCoroutine( _lifetimeCor );
-    
+        
+        private Coroutine _lifetimeCor;
+        
+        private bool _isConstructed;
+
         [Inject]
         public void Construct(BulletConfig config, BulletPool bulletPool)
         {
             _config = config;
             _bulletPool = bulletPool;
             _isConstructed = true;
+        }
+
+        void OnEnable()
+        {
+            if (_isConstructed)
+                _lifetimeCor = StartCoroutine( Lifetime_Cor() );
+        }
+
+        void OnDisable()
+        {
+            if (_lifetimeCor != null)
+            {
+                StopCoroutine(_lifetimeCor);
+                _lifetimeCor = null; 
+            }
         }
 
         private void Update()
@@ -45,9 +59,9 @@ namespace Core
             }
         }
     
-        void Move(float delta)			=> transform.position += Direction * delta;
+        private void Move(float delta)	=> transform.position += Direction * delta;
     
-        Collider Raycast(float delta)
+        private Collider Raycast(float delta)
         {
             Vector3 origin	= transform.position;
             Vector3 dir		= Direction;
@@ -63,7 +77,7 @@ namespace Core
             return hitInfo.collider;
         }
     
-        IEnumerator Lifetime_Cor()
+        private IEnumerator Lifetime_Cor()
         {
             yield return new WaitForSeconds( _config.bulletLifeTime );
 

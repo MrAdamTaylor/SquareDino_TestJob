@@ -1,4 +1,7 @@
+using Core.Enemy;
+using Core.GameControll;
 using Core.ObjectPool;
+using Infrastructure.Bootstrap;
 using Infrastructure.DI.Container;
 using Infrastructure.Factory;
 using UnityEngine;
@@ -7,12 +10,12 @@ namespace Infrastructure.StateMachine
 {
     public class InitState : IState
     {
-        private IFactory _enemyFactory;
-        private IFactory _playerFactory;
-        private IFactory _bulletFactory;
-        private Container _container;
-        private GameManager _gameManager;
-        private GameStateMachine _gameStateMachine;
+        private readonly IFactory _enemyFactory;
+        private readonly IFactory _playerFactory;
+        private readonly IFactory _bulletFactory;
+        private readonly Container _container;
+        private readonly GameManager _gameManager;
+        private readonly GameStateMachine _gameStateMachine;
     
         public InitState(GameStateMachine gameStateMachine, Container container, GameManager gameManager)
         {
@@ -41,9 +44,8 @@ namespace Infrastructure.StateMachine
             creator.GenerateGameTask();
 
             GameObject parent = GameObject.Find("[GameObjects]");
-        
-            GameObject startPoint = GameObject.Find("StartWaypoint");
-            _playerFactory.Create(startPoint.transform.position, parent.transform);
+            
+            _playerFactory.Create(_gameManager.StartPoint.position, parent.transform);
             
             EnemyManager enemyManager = new EnemyManager();
             _container.CacheType(enemyManager.GetType(),enemyManager);

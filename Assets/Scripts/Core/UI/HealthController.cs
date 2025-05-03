@@ -10,12 +10,12 @@ namespace Core.UI
         private readonly HealthView _view;
         private readonly Action _onDeath;
 
-        public HealthController(Health health, HealthView view, Action onDeath = null)
+        public HealthController(Health health, HealthView view, Camera camera, Action onDeath = null)
         {
             _health = health;
             _view = view;
             _onDeath = onDeath;
-            
+            _view.Construct(camera);
             _view.SetValue(_health.Normalized);
         }
 

@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using Core.Enemy;
 using Core.ObjectPool;
 using Infrastructure.DI.Injector;
 using UnityEngine;
 
-namespace Infrastructure.StateMachine
+namespace Core.Enemy
 {
     public class EnemyManager
     {
@@ -44,17 +43,6 @@ namespace Infrastructure.StateMachine
             _ragdollEnemiesList.Clear();
         }
 
-        private void ReturnEnemyInPool(GameObject enemyObject)
-        {
-            if (enemyObject.TryGetComponent(out Enemy enemy))
-            {
-                enemy.OnDeath -= HandleEnemyDeath;
-                enemy.Recovery();
-            }
-
-            _enemyPool.Return(enemyObject);
-        }
-
         public void ReloadAllEnemies()
         {
             if (_oldRagdollEnemiesList.Count > 0)
@@ -78,6 +66,17 @@ namespace Infrastructure.StateMachine
                     ReturnEnemyInPool(_ragdollEnemiesList[i]);
                 _ragdollEnemiesList.Clear();
             }
+        }
+
+        private void ReturnEnemyInPool(GameObject enemyObject)
+        {
+            if (enemyObject.TryGetComponent(out Enemy enemy))
+            {
+                enemy.OnDeath -= HandleEnemyDeath;
+                enemy.Recovery();
+            }
+
+            _enemyPool.Return(enemyObject);
         }
 
         private void SubscribeToDeath(GameObject enemyGO)

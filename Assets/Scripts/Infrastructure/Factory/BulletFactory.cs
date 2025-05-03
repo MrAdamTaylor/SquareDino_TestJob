@@ -1,4 +1,5 @@
 using Core;
+using Core.Other;
 using Infrastructure.DI.Container;
 using Infrastructure.DI.Injector;
 using UnityEngine;
@@ -7,11 +8,11 @@ namespace Infrastructure.Factory
 {
     public class BulletFactory : IFactory
     {
+        private const string BULLET_PREFAB_PATH = "Prefabs/Bullet/Bullet";
+        
         [Inject] private AssetLoader _assetLoader;
         [Inject] private Container _container;
-    
-        private const string BULLET_PREFAB_PATH = "Prefabs/Bullet/Bullet";
-    
+
         public GameObject Create(Vector3 position, Transform parent)
         {
             var prefab = _assetLoader.LoadPrefab(BULLET_PREFAB_PATH);

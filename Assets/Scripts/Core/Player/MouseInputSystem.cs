@@ -7,17 +7,14 @@ namespace Core.Player
 {
     public class MouseInputSystem 
     {
-        public bool CanControlPlayer => _canControlPlayer;
-        
         private Camera _camera;
         private  BulletPool _bulletPool;
         private bool _isEnabled;
-        private bool _canControlPlayer;
 
         public event Action OnFirstClick;
         
         private bool _firstClickProcessed = false;
-        
+
         [Inject]
         public void Construct(Camera camera, BulletPool bulletPool)
         {
@@ -26,10 +23,12 @@ namespace Core.Player
             _isEnabled = true;
         }
 
+        public void Enable()  => _isEnabled = true;
+        public void Disable() => _isEnabled = false;
+
         public void StartConfigure()
         {
             _firstClickProcessed = false;
-            _canControlPlayer = false;
         }
 
         public void Tick()
@@ -37,24 +36,20 @@ namespace Core.Player
             if (!_isEnabled)
                 return;
 
-            if (Input.GetMouseButtonDown(0)) 
+            if (!Input.GetMouseButtonDown(0)) 
+                return;
+            
+            if (!_firstClickProcessed)
             {
-                if (!_firstClickProcessed)
-                {
-                    _firstClickProcessed = true;
-                    _canControlPlayer = true;
-                    OnFirstClick?.Invoke();
-                    OnFirstClick = null;
-                    return;
-                }
-
-                Vector3 screenPos = Input.mousePosition;
-                Ray ray = _camera.ScreenPointToRay(screenPos);
-                _bulletPool.Spawn(_camera.transform.position, Quaternion.LookRotation( ray.direction ));
+                _firstClickProcessed = true;
+                OnFirstClick?.Invoke();
+                OnFirstClick = null;
+                return;
             }
-        }
 
-        public void Enable()  => _isEnabled = true;
-        public void Disable() => _isEnabled = false;
+            Vector3 screenPos = Input.mousePosition;
+            Ray ray = _camera.ScreenPointToRay(screenPos);
+            _bulletPool.Spawn(_camera.transform.position, Quaternion.LookRotation( ray.direction ));
+        }
     }
 }

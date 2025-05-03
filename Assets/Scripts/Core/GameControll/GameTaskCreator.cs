@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using Core;
+using Core.Other;
 using Infrastructure.DI.Container;
 using Infrastructure.DI.Injector;
 using UnityEngine;
 
-namespace Infrastructure.StateMachine
+namespace Core.GameControll
 {
     public class GameTaskCreator
     {
@@ -26,8 +26,6 @@ namespace Infrastructure.StateMachine
 
         public void GenerateGameTask()
         {
-            List<(Transform,GameTask)> gameTasks = new();
-        
             for (int i = 0; i < _waypoints.Count; i++)
             {
                 TagRadiusDetector detector;
@@ -39,19 +37,14 @@ namespace Infrastructure.StateMachine
                 }
             
                 var waypointInfo = detector.Scan();
-                Transform cameraLookTransform = null;
                 List<Transform> enemySpawnerTransforms = new();
 
                 for (int j = 0; j < waypointInfo.Count; j++)
                 {
                     string tag = waypointInfo[j].tag;
                     Transform transform = waypointInfo[j].transform;
-
-                    if (tag == "CameraLook" && cameraLookTransform == null)
-                    {
-                        cameraLookTransform = transform; 
-                    }
-                    else if (tag == "EnemySpawner")
+                    
+                    if (tag == "EnemySpawner")
                     {
                         enemySpawnerTransforms.Add(transform);
                     }
@@ -59,7 +52,7 @@ namespace Infrastructure.StateMachine
             
                 if (enemySpawnerTransforms.Count > 0)
                 {
-                    GameTask task = new GameTask(cameraLookTransform, enemySpawnerTransforms);
+                    GameTask task = new GameTask( enemySpawnerTransforms);
                 
                     _gameTasks.Add((_waypoints[i],task));
                 }

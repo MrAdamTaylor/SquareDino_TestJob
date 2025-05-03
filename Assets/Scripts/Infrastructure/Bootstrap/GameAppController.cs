@@ -1,10 +1,11 @@
+using Core.GameControll;
 using Infrastructure.DI.Container;
 using Infrastructure.StateMachine;
 using UnityEngine;
 
-namespace Infrastructure
+namespace Infrastructure.Bootstrap
 {
-    public class GameAppController : MonoBehaviour
+    public class GameAppController 
     {
         private GameStateMachine _gameStateMachine;
         public void Init(Container container, Transform startPoint, LevelReloaderTrigger levelReloaderTrigger)
@@ -14,12 +15,5 @@ namespace Infrastructure
             _gameStateMachine.Enter<InitState>();
         
         }
-    }
-
-
-    public interface IState
-    {
-        void Enter();
-        void Exit();
     }
 }

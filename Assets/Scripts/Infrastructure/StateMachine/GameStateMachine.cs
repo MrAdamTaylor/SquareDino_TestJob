@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Core.GameControll;
+using Infrastructure.Bootstrap;
 using Infrastructure.DI.Container;
 
 namespace Infrastructure.StateMachine
@@ -13,8 +15,8 @@ namespace Infrastructure.StateMachine
             _states = new Dictionary<Type, IState>
             {
                 [typeof(InitState)] = new InitState(this, container, gameManager),
-                [typeof(OnStartState)] = new OnStartState(this, container, gameManager),
-                [typeof(GameLoopState)] = new GameLoopState(this, gameManager)
+                [typeof(OnStartState)] = new OnStartState( gameManager),
+                [typeof(GameLoopState)] = new GameLoopState( gameManager)
             };
         }
     

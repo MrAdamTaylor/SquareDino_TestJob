@@ -6,7 +6,7 @@ namespace Core.Configs
     public class BulletConfig : ScriptableObject
     {
     
-        public int bulletsInPool;
+        public int bulletCountsInPool;
     
         public float bulletSpeed;
         public int bulletDamage;

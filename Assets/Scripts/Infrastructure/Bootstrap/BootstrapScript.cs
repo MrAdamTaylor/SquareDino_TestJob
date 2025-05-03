@@ -2,12 +2,13 @@ using System.Collections.Generic;
 using Cinemachine;
 using Core.Configs;
 using Core.Enemy;
+using Core.GameControll;
 using Infrastructure.DI.Container;
 using Infrastructure.DI.Model;
 using Infrastructure.Factory;
 using UnityEngine;
 
-namespace Infrastructure
+namespace Infrastructure.Bootstrap
 {
     public class BootstrapScript : MonoBehaviour
     {
@@ -53,8 +54,8 @@ namespace Infrastructure
             }
             container.CreateScope();
         
-            GameObject gameObject = new GameObject("[GameAppController]");
-            var gameAppController = gameObject.AddComponent<GameAppController>();
+
+            GameAppController gameAppController = new();
             gameAppController.Init(container, _startPoint, _levelReloaderTrigger);
         }
         

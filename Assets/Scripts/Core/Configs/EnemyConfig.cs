@@ -7,7 +7,7 @@ namespace Core.Configs
     {
         public int Health;
         
-        
+        [Header("The force with which the ragdoll flies off")]
         public float ThrowForce;
     }
 }

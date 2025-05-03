@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6108741b66510a942aa400293abacd34, type: 3}
   m_Name: Bullet
   m_EditorClassIdentifier: 
-  bulletsInPool: 10
+  bulletCountsInPool: 10
   bulletSpeed: 20
   bulletDamage: 30
   bulletLifeTime: 5

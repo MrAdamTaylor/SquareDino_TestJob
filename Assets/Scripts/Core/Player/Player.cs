@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Cinemachine;
+using Core.Configs;
 using Infrastructure.DI.Injector;
 using UnityEngine;
 using UnityEngine.AI;
@@ -12,7 +13,7 @@ namespace Core.Player
         static readonly int IsRun = Animator.StringToHash( "IsRun" );
     
         [SerializeField] private CinemachineFreeLook _freeLockCamera;
-
+        
         private List<Transform> _waypoints;
         private NavMeshAgent _navMeshAgent;
         private Animator _animator;
@@ -24,12 +25,13 @@ namespace Core.Player
         private bool _isConstruct;
     
         [Inject]
-        public void Construct(CinemachineFreeLook virtualCamera, MouseInputSystem mouseInputSystem)
+        public void Construct(CinemachineFreeLook virtualCamera, MouseInputSystem mouseInputSystem, PlayerConfig playerConfig)
         {
             _freeLockCamera = virtualCamera;
             _freeLockCamera.Follow = transform;
             _freeLockCamera.LookAt = transform;
             _navMeshAgent = GetComponent<NavMeshAgent>();
+            _navMeshAgent.speed = playerConfig.Speed;
             _animator = GetComponent<Animator>();
             _mouseInputSystem = mouseInputSystem;
             _canMove = true;

@@ -1,4 +1,6 @@
 using System;
+using Core.GameControll;
+using Infrastructure.Bootstrap;
 using Infrastructure.DI.Container;
 
 namespace Infrastructure.StateMachine
@@ -7,9 +9,10 @@ namespace Infrastructure.StateMachine
     {
         private GameManager _gameManager;
 
-        public OnStartState(GameStateMachine gameStateMachine, Container container, GameManager gameManager)
+        public OnStartState( GameManager gameManager)
         {
             _gameManager = gameManager;
+            
         }
     
         public void Enter()
