@@ -8172,6 +8172,8 @@ MonoBehaviour:
   - {fileID: 551881869}
   - {fileID: 1872216980}
   - {fileID: 2016598752}
+  _startPoint: {fileID: 400618270}
+  _levelReloaderTrigger: {fileID: 2016598754}
 --- !u!1 &941671218
 GameObject:
   m_ObjectHideFlags: 0
@@ -16123,7 +16125,9 @@ GameObject:
   m_Component:
   - component: {fileID: 2016598752}
   - component: {fileID: 2016598753}
-  m_Layer: 3
+  - component: {fileID: 2016598754}
+  - component: {fileID: 2016598755}
+  m_Layer: 0
   m_Name: FinishWaypoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16157,6 +16161,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bd30ed987d0bb54bb2743c525206203, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2016598754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2016598751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3eb83289cea83047a30fb5a8bf60020, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!135 &2016598755
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2016598751}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 1
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 62
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2020964978
 GameObject:
   m_ObjectHideFlags: 0

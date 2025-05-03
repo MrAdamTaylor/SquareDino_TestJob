@@ -18,7 +18,6 @@ namespace Core.Player
         private Animator _animator;
     
         private MouseInputSystem _mouseInputSystem;
-        private int _currentIndex;
 
         private bool _canMove;
         private bool _isMoving = true;
@@ -37,38 +36,45 @@ namespace Core.Player
             _isMoving = false;
             _isConstruct = true;
         }
-    
-    
+
         private void Update()
         {
-            /*if (Input.GetKeyDown(KeyCode.F) && _canMove && !_isMoving)
-            {
-                TryMoveToNextWaypoint();
-            }
-            
-            if (Input.GetKeyDown(KeyCode.G) && !_canMove && !_isMoving)
-            {
-                _canMove = true;
-            }*/
-            
             if(_isConstruct)
                 _mouseInputSystem.Tick();
         }
-    
+
+        public void ConfigureBeforeStart()
+        {
+            if (!_navMeshAgent.enabled) 
+                _navMeshAgent.enabled = true;
+        }
+
         public void TryMoveToNextWaypoint(Transform point)
         {
-            /*if (_currentIndex >= _waypoints.Count)
-                return;*/
-
             _isMoving = true;
             _canMove = false;
             _mouseInputSystem.Disable();
             _animator.SetBool( IsRun, true );
 
             Transform target = point;
+            
+
             _navMeshAgent.SetDestination(target.position);
 
             StartCoroutine(WaitForArrival());
+        }
+
+        public void PlayerStop()
+        {
+            _navMeshAgent.isStopped = true;
+            _navMeshAgent.ResetPath(); 
+            _navMeshAgent.enabled = false;
+            StopAllCoroutines();
+            
+            _animator.SetBool(IsRun, false);
+            _isMoving = false;
+            _canMove = false;
+            _mouseInputSystem.Disable();
         }
 
         private IEnumerator WaitForArrival()
@@ -81,7 +87,6 @@ namespace Core.Player
             _isMoving = false;
             _mouseInputSystem.Enable();
             _animator.SetBool( IsRun, false );
-            _currentIndex++;
         }
     }
 }

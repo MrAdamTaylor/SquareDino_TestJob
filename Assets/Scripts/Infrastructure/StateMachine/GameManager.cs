@@ -1,0 +1,114 @@
+using System.Collections.Generic;
+using System.Linq;
+using Core.Player;
+using Infrastructure.DI.Injector;
+using UnityEngine;
+
+namespace Infrastructure.StateMachine
+{
+    public class GameManager
+    {
+        private int _completedSteps = 0;
+        
+        [Inject] private EnemyManager _enemyManager;
+        [Inject] private List<(Transform,GameTask)> _gameTasks;
+        [Inject] private MouseInputSystem _mouseInputSystem;
+        [Inject] private Player _player;
+        
+        public Transform StartPoint { get; private set; }
+        
+        private GameStateMachine _gameStateMachine;
+        private Queue<Transform> _waypoints;
+        private Queue<GameTask> _tasks;
+        private GameTask _currentTask;
+        private LevelReloaderTrigger _levelReloaderTrigger;
+
+        public GameManager(Transform startPoint, LevelReloaderTrigger levelReloaderTrigger)
+        {
+            StartPoint = startPoint;
+            _levelReloaderTrigger = levelReloaderTrigger;
+            _levelReloaderTrigger.Construct(this);
+        }
+
+        public void Construct(GameStateMachine gameStateMachine)
+        {
+            _gameStateMachine = gameStateMachine;
+        }
+
+        public void GameStart()
+        {
+            _tasks = new Queue<GameTask>(_gameTasks.Select(t => t.Item2));
+            _waypoints = new Queue<Transform>(_gameTasks.Select(t => t.Item1));
+            
+            AssignNextTask();
+        }
+
+        
+        private void AssignNextTask()
+        {
+            if (_tasks.Count == 0)
+            {
+                _currentTask.OnCompleted -= NextStep;
+                Debug.Log("<color=green>All tasks completed</color>");
+                _player.TryMoveToNextWaypoint(_levelReloaderTrigger.gameObject.transform);
+                return;
+            }
+
+            _currentTask = _tasks.Dequeue();
+            _currentTask.OnCompleted += NextStep;
+            _enemyManager.SpawnEnemies(_currentTask.GetPositions());
+
+            Transform waypoint = _waypoints.Dequeue();
+            _player.TryMoveToNextWaypoint(waypoint);
+            
+            
+            var activeEnemies = _enemyManager.ActiveEnemies;
+            for (int i = 0; i < activeEnemies.Count; i++)
+            {
+                _currentTask.AttachEnemy(activeEnemies[i]);
+            }
+
+            Debug.Log($"<color=cyan>Task assigned {_completedSteps}</color>");
+        }
+        
+        
+        private void NextStep()
+        {
+            _currentTask.OnCompleted -= NextStep;
+
+            _completedSteps++;
+            
+            if(_gameTasks.Count - _tasks.Count > 1)
+                _enemyManager.OnTaskCompleted(_completedSteps);
+            AssignNextTask();
+        }
+
+        public void StartConfigure()
+        {
+            _completedSteps = 0;
+            _enemyManager.ReloadAllEnemies();
+            _mouseInputSystem.Enable();
+            _mouseInputSystem.StartConfigure();
+            _mouseInputSystem.OnFirstClick += EnterGameLoop;
+            _player.ConfigureBeforeStart();
+        }
+
+        private void EnterGameLoop()
+        {
+            _mouseInputSystem.OnFirstClick -= EnterGameLoop;
+            _gameStateMachine.Enter<GameLoopState>();
+        }
+
+        public void ReloadGame()
+        {
+            _player.PlayerStop();
+            _player.gameObject.transform.position = StartPoint.position;
+            for (int i = 0; i < _gameTasks.Count; i++)
+            {
+                _gameTasks[i].Item2.Reset();
+            }
+
+            _gameStateMachine.Enter<OnStartState>();
+        }
+    }
+}

@@ -32,8 +32,7 @@ namespace Core.ObjectPool
             bullet.SetActive(false);
             _pool.Return(bullet);
         }
-
-        public int GetUnpooledCount() => _pool.GetUnpooledCount();
+        
     }
 
     public class EnemyPool
@@ -53,8 +52,7 @@ namespace Core.ObjectPool
             {
                 if (_pool.PoolCount <= 0)
                 {
-                    Debug.Log("<color=red>Pool exhausted</color>");
-                    break; // используем break вместо return, чтобы вернуть уже заспавненных
+                    break; 
                 }
 
                 GameObject enemy = _pool.Get();

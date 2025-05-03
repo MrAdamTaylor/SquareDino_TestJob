@@ -50,7 +50,6 @@ namespace Core.Player
 
                 Vector3 screenPos = Input.mousePosition;
                 Ray ray = _camera.ScreenPointToRay(screenPos);
-                Debug.Log("Clicked");
                 _bulletPool.Spawn(_camera.transform.position, Quaternion.LookRotation( ray.direction ));
             }
         }

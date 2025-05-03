@@ -24,7 +24,7 @@ namespace Infrastructure.StateMachine
 
         public void Exit()
         {
-            throw new NotImplementedException();
+            
         }
     }
 }

@@ -9,6 +9,9 @@ namespace Infrastructure.StateMachine
     public class GameTaskCreator
     {
         private const int ACTIVE_TASK_COUNT = 3;
+        
+        //NOTE With strict calculation, sometimes during a repeated game a bug occurs, in which a dead enemy spawns
+        private const int ADDITIONAL_RALIABILITY = 2; 
     
         private List<Transform> _waypoints = new();
         private Container _container;
@@ -64,12 +67,6 @@ namespace Infrastructure.StateMachine
                 _container.CacheType(_gameTasks.GetType(), _gameTasks);
                 var detectorComponent = _waypoints[i].gameObject.GetComponent<TagRadiusDetector>();
                 UnityEngine.Object.Destroy(detectorComponent);
-            
-            }
-
-            for (int i = 0; i < gameTasks.Count; i++)
-            {
-                gameTasks[i].Item2.OutputInfo();
             }
         }
 
@@ -102,7 +99,7 @@ namespace Infrastructure.StateMachine
                     maxSum = windowSum;
             }
 
-            return maxSum;
+            return maxSum + ADDITIONAL_RALIABILITY;
         }
     }
 }

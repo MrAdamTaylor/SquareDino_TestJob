@@ -7,11 +7,10 @@ namespace Infrastructure
     public class GameAppController : MonoBehaviour
     {
         private GameStateMachine _gameStateMachine;
-        public void Init(Container container)
+        public void Init(Container container, Transform startPoint, LevelReloaderTrigger levelReloaderTrigger)
         {
-            GameManager gameManager = new GameManager();
-            
-            _gameStateMachine = new GameStateMachine(container, new GameManager());
+            GameManager gameManager = new GameManager(startPoint, levelReloaderTrigger);
+            _gameStateMachine = new GameStateMachine(container, gameManager);
             _gameStateMachine.Enter<InitState>();
         
         }

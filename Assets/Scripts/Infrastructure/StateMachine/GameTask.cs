@@ -24,6 +24,13 @@ namespace Infrastructure.StateMachine
         
         public void AttachEnemy(Enemy enemy)
         {
+
+            if (enemy.IsDeath)
+            {
+                enemy.OnDeath -= OnEnemyKilled;
+                enemy.Recovery();
+            }
+
             enemy.OnDeath += OnEnemyKilled;
         }
 
@@ -35,17 +42,17 @@ namespace Infrastructure.StateMachine
             if (_currentKills >= _purposeCount)
             {
                 OnCompleted?.Invoke(); 
-                OnCompleted = null;    
+                //OnCompleted = null;    
             }
-        }
-
-        public void OutputInfo()
-        {
-            Debug.Log($"<color=magenta>Camera Look Target: {_cameraLookTarget.gameObject.name} and SpawnPoints is {_enemySpawnPoints.Count} </color>");
         }
     
         public int EnemyCount => _enemySpawnPoints.Count;
 
         public Transform[] GetPositions() => _enemySpawnPoints.ToArray();
+
+        public void Reset()
+        {
+            _currentKills = 0;
+        }
     }
 }

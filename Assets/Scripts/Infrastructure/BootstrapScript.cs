@@ -21,7 +21,7 @@ namespace Infrastructure
         [Header("StartPoint")]
         [SerializeField] private Transform _startPoint;
         [Header("FinishPoint")]
-        [SerializeField] private Transform _endPoint;
+        [SerializeField] private LevelReloaderTrigger _levelReloaderTrigger;
         
         public void Start()
         {
@@ -55,7 +55,7 @@ namespace Infrastructure
         
             GameObject gameObject = new GameObject("[GameAppController]");
             var gameAppController = gameObject.AddComponent<GameAppController>();
-            gameAppController.Init(container);
+            gameAppController.Init(container, _startPoint, _levelReloaderTrigger);
         }
         
         
