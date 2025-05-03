@@ -25,7 +25,7 @@ namespace Core.Player
         private bool _isConstruct;
     
         [Inject]
-        public void Construct(CinemachineFreeLook virtualCamera, List<Transform> waypoints, MouseInputSystem mouseInputSystem)
+        public void Construct(CinemachineFreeLook virtualCamera, MouseInputSystem mouseInputSystem)
         {
             _freeLockCamera = virtualCamera;
             _freeLockCamera.Follow = transform;
@@ -33,7 +33,6 @@ namespace Core.Player
             _navMeshAgent = GetComponent<NavMeshAgent>();
             _animator = GetComponent<Animator>();
             _mouseInputSystem = mouseInputSystem;
-            _waypoints = waypoints;
             _canMove = true;
             _isMoving = false;
             _isConstruct = true;
@@ -42,29 +41,31 @@ namespace Core.Player
     
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.F) && _canMove && !_isMoving)
+            /*if (Input.GetKeyDown(KeyCode.F) && _canMove && !_isMoving)
             {
                 TryMoveToNextWaypoint();
             }
-            if(_isConstruct)
-                _mouseInputSystem.Tick();
+            
             if (Input.GetKeyDown(KeyCode.G) && !_canMove && !_isMoving)
             {
                 _canMove = true;
-            }
+            }*/
+            
+            if(_isConstruct)
+                _mouseInputSystem.Tick();
         }
     
-        private void TryMoveToNextWaypoint()
+        public void TryMoveToNextWaypoint(Transform point)
         {
-            if (_currentIndex >= _waypoints.Count)
-                return;
+            /*if (_currentIndex >= _waypoints.Count)
+                return;*/
 
             _isMoving = true;
             _canMove = false;
             _mouseInputSystem.Disable();
             _animator.SetBool( IsRun, true );
 
-            Transform target = _waypoints[_currentIndex];
+            Transform target = point;
             _navMeshAgent.SetDestination(target.position);
 
             StartCoroutine(WaitForArrival());

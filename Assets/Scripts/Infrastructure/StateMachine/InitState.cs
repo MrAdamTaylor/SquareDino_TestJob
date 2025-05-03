@@ -1,7 +1,8 @@
 using System.Collections.Generic;
-using Core;
-using Core.Configs;
+using System.Linq;
+using Core.Enemy;
 using Core.ObjectPool;
+using Core.Player;
 using Extensions;
 using Infrastructure.DI.Container;
 using Infrastructure.DI.Injector;
@@ -16,9 +17,14 @@ namespace Infrastructure.StateMachine
         private IFactory _playerFactory;
         private IFactory _bulletFactory;
         private Container _container;
+        private GameManager _gameManager;
+        private GameStateMachine _gameStateMachine;
     
-        public InitState(GameStateMachine gameStateMachine, Container container)
+        public InitState(GameStateMachine gameStateMachine, Container container, GameManager gameManager)
         {
+            _gameStateMachine = gameStateMachine;
+            _gameManager = gameManager;
+            _gameManager.Construct(_gameStateMachine);
             _container = container;
             var scope = container.CreateScope();
             _enemyFactory = (IFactory)scope.Resolve(typeof(EnemyFactory));
@@ -31,6 +37,7 @@ namespace Infrastructure.StateMachine
             container.Construct(_bulletFactory);
             container.CacheType(bulletPool.GetType(), bulletPool);
             container.CacheType(enemyPool.GetType(), enemyPool);
+            container.CacheType(_gameManager.GetType(), _gameManager);
         }
 
         public void Enter()
@@ -41,25 +48,33 @@ namespace Infrastructure.StateMachine
 
             GameObject parent = GameObject.Find("[GameObjects]");
         
+            GameObject startPoint = GameObject.Find("StartWaypoint");
+            _playerFactory.Create(startPoint.transform.position, parent.transform);
+            
+            EnemyManager enemyManager = new EnemyManager();
+            _container.CacheType(enemyManager.GetType(),enemyManager);
+            
+            
             PoolBuilder poolBuilder = new PoolBuilder((BulletFactory)_bulletFactory,(EnemyFactory)_enemyFactory, parent.transform);
             _container.Construct(poolBuilder);
             int enemyCount = creator.CalculateOptimalEnemyPool();
             poolBuilder.ConfigurePools(enemyCount);
         
-            GameObject enemiesSpawnPointParent = GameObject.Find("[EnemiesSpawnPoints]");
+            _container.Construct(enemyManager);
+            
+            _container.Construct(_gameManager);
+            
+            _gameStateMachine.Enter<OnStartState>();
+            /*GameObject enemiesSpawnPointParent = GameObject.Find("[EnemiesSpawnPoints]");
         
             var spawnPoints = new List<Transform>();
             if (enemiesSpawnPointParent != null)
                 spawnPoints = enemiesSpawnPointParent.transform.GetAllChildren();
-
-            GameObject startPoint = GameObject.Find("StartWaypoint");
-
-            _playerFactory.Create(startPoint.transform.position, parent.transform);
         
             for (int i = 0; i < spawnPoints.Count; i++)
             {
                 _enemyFactory.Create(spawnPoints[i].position, parent.transform);
-            }
+            }*/
         }
 
         public void Exit()
@@ -68,154 +83,139 @@ namespace Infrastructure.StateMachine
         }
     }
 
-    public class PoolBuilder
+
+    public class EnemyManager
     {
-        [Inject] private BulletPool _bulletPool;
         [Inject] private EnemyPool _enemyPool;
-        private BulletFactory _bulletFactory;
-        private EnemyFactory _enemyFactory;
-        private Transform _globalParent;
-        private BulletConfig _bulletConfig;
-        private EnemyConfig _enemyConfig;
-    
-        public PoolBuilder(BulletFactory bulletFactory, EnemyFactory enemyFactory, Transform globalParent)
-        {
-            _enemyFactory = enemyFactory;
-            _bulletFactory = bulletFactory;
-            _globalParent = globalParent;
-        }
 
-        [Inject]
-        public void Construct(BulletConfig bulletConfig, EnemyConfig enemyConfig)
-        {
-            _bulletConfig = bulletConfig;
-            _enemyConfig = enemyConfig;
-        }
-
-        public void ConfigurePools(int enemiesCount)
-        {
-            _bulletPool.Construct(_bulletConfig.bulletsInPool, ()=> _bulletFactory.Create(Vector3.zero, _globalParent));
-            _enemyPool.Construct(enemiesCount, ()=> _enemyFactory.Create(Vector3.zero, _globalParent));
-        }
-    }
-
-
-
-    public class GameTaskCreator
-    {
-        private const int ACTIVE_TASK_COUNT = 3;
-    
-        private List<Transform> _waypoints = new();
-        private Container _container;
-        private List<(Transform, GameTask)> _gameTasks = new();
-    
-        [Inject]
-        public void Construct(List<Transform> waypoints, Container container)
-        {
-            _container = container;
-            _waypoints = waypoints;
-        }
-
-        public void GenerateGameTask()
-        {
-            List<(Transform,GameTask)> gameTasks = new();
+        public IReadOnlyList<Enemy> ActiveEnemies => _activeEnemies;
         
-            for (int i = 0; i < _waypoints.Count; i++)
+        private List<GameObject> _ragdollEnemiesList = new();
+        private List<Enemy> _activeEnemies = new();
+
+        public void SpawnEnemies(Transform[] enemiesPoints)
+        {
+            var enemies = _enemyPool.SpawnAtPositions(enemiesPoints.Length, enemiesPoints);
+            
+            for (int i = 0; i < enemies.Count; i++)
             {
-                TagRadiusDetector detector;
-                if (!_waypoints[i].gameObject.TryGetComponent(out detector))
-                {
-                    var spawnPointComponent = _waypoints[i].gameObject.GetComponent<TagRadiusDetector>();
-                    UnityEngine.Object.Destroy(spawnPointComponent);
-                    continue;
-                }
-            
-                var waypointInfo = detector.Scan();
-                Transform cameraLookTransform = null;
-                List<Transform> enemySpawnerTransforms = new();
+                SubscribeToDeath(enemies[i]);
+            }
+        }
 
-                for (int j = 0; j < waypointInfo.Count; j++)
-                {
-                    string tag = waypointInfo[j].tag;
-                    Transform transform = waypointInfo[j].transform;
-
-                    if (tag == "CameraLook" && cameraLookTransform == null)
-                    {
-                        cameraLookTransform = transform; 
-                    }
-                    else if (tag == "EnemySpawner")
-                    {
-                        enemySpawnerTransforms.Add(transform);
-                    }
-                }
+        public void DespawnKilledEnemies()
+        {
+            if(_ragdollEnemiesList.Count <= 0)
+                return;
             
-                if (enemySpawnerTransforms.Count > 0)
+            
+            for (int i = 0; i < _ragdollEnemiesList.Count; i++)
+            {
+                if (_ragdollEnemiesList[i].TryGetComponent(out Enemy enemy))
                 {
-                    GameTask task = new GameTask(cameraLookTransform, enemySpawnerTransforms);
+                    enemy.OnDeath -= HandleEnemyDeath;
+                }
                 
-                    _gameTasks.Add((_waypoints[i],task));
-                }
-
-                var detectorComponent = _waypoints[i].gameObject.GetComponent<TagRadiusDetector>();
-                UnityEngine.Object.Destroy(detectorComponent);
-            
-            }
-
-            for (int i = 0; i < gameTasks.Count; i++)
-            {
-                gameTasks[i].Item2.OutputInfo();
+                _enemyPool.Return(_ragdollEnemiesList[i]);
             }
         }
 
-        public int CalculateOptimalEnemyPool()
+        private void SubscribeToDeath(GameObject enemyGO)
         {
-            int taskCount = _gameTasks.Count;
-        
-            if (taskCount <= ACTIVE_TASK_COUNT)
+            if (enemyGO.TryGetComponent(out Enemy enemy))
             {
-                int total = 0;
-                for (int i = 0; i < taskCount; i++)
-                {
-                    total += _gameTasks[i].Item2.EnemyCount; 
-                }
-                return total;
-            }
-        
-            int maxSum = 0;
-
-            for (int start = 0; start <= taskCount - ACTIVE_TASK_COUNT; start++)
-            {
-                int windowSum = 0;
-                for (int offset = 0; offset < ACTIVE_TASK_COUNT; offset++)
-                {
-                    int index = start + offset;
-                    windowSum += _gameTasks[index].Item2.EnemyCount;  
-                }
-
-                if (windowSum > maxSum)
-                    maxSum = windowSum;
+                enemy.OnDeath += HandleEnemyDeath;
+                _activeEnemies.Add(enemy);
             }
 
-            return maxSum;
         }
+        
+        private void HandleEnemyDeath(Enemy enemy)
+        {
+            _ragdollEnemiesList.Add(enemy.gameObject);
+            _activeEnemies.Remove(enemy);
+        }
+
     }
 
-    public class GameTask
+    public class GameManager
     {
-        private Transform _cameraLookTarget;
-        private List<Transform> _enemySpawnPoints;
+        [Inject] private EnemyManager _enemyManager;
+        [Inject] private List<(Transform,GameTask)> _gameTasks;
+        [Inject] private MouseInputSystem _mouseInputSystem;
+        [Inject] private Player _player;
+        
+        private GameStateMachine _gameStateMachine;
+        private Queue<Transform> _waypoints;
+        private Queue<GameTask> _tasks;
+        private GameTask _currentTask;
 
-        public GameTask(Transform cameraLookTarget, List<Transform> enemySpawnPoints)
+
+        public void Construct(GameStateMachine gameStateMachine)
         {
-            _cameraLookTarget = cameraLookTarget;
-            _enemySpawnPoints = enemySpawnPoints;
+            _gameStateMachine = gameStateMachine;
         }
 
-        public void OutputInfo()
+        public void GameStart()
         {
-            Debug.Log($"<color=magenta>Camera Look Target: {_cameraLookTarget.gameObject.name} and SpawnPoints is {_enemySpawnPoints.Count} </color>");
+            _tasks = new Queue<GameTask>(_gameTasks.Select(t => t.Item2));
+            _waypoints = new Queue<Transform>(_gameTasks.Select(t => t.Item1));
+            
+            AssignNextTask();
         }
-    
-        public int EnemyCount => _enemySpawnPoints.Count;
+
+        
+        private void AssignNextTask()
+        {
+            if (_tasks.Count == 0)
+            {
+                Debug.Log("<color=green>All tasks completed</color>");
+                return;
+            }
+
+            _currentTask = _tasks.Dequeue();
+            _currentTask.OnCompleted += NextStep;
+            _enemyManager.SpawnEnemies(_currentTask.GetPositions());
+
+            Transform waypoint = _waypoints.Dequeue();
+            _player.TryMoveToNextWaypoint(waypoint);
+
+            var spawnPoints = _currentTask.GetPositions();
+            
+            var activeEnemies = _enemyManager.ActiveEnemies;
+            for (int i = 0; i < activeEnemies.Count; i++)
+            {
+                _currentTask.AttachEnemy(activeEnemies[i]);
+            }
+
+            Debug.Log("<color=cyan>Task assigned</color>");
+        }
+        
+        
+        private void NextStep()
+        {
+            _currentTask.OnCompleted -= NextStep; 
+            /*if(_gameTasks.Count - _tasks.Count > 1)
+                _enemyManager.DespawnKilledEnemies();*/
+            AssignNextTask();
+            
+        }
+
+        public void StartConfigure()
+        {
+            _enemyManager.DespawnKilledEnemies();
+            //_enemyManager.SpawnEnemies(_gameTasks[0].Item2.GetPositions());
+
+            _mouseInputSystem.Enable();
+            _mouseInputSystem.StartConfigure();
+            _mouseInputSystem.OnFirstClick += EnterGameLoop;
+        }
+
+        private void EnterGameLoop()
+        {
+            _mouseInputSystem.OnFirstClick -= EnterGameLoop;
+            _gameStateMachine.Enter<GameLoopState>();
+        }
+
     }
 }

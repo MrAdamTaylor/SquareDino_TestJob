@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: Enemy
   m_EditorClassIdentifier: 
   Health: 100
+  ThrowForce: 10

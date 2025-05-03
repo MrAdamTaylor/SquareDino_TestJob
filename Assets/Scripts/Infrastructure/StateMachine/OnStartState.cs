@@ -5,19 +5,21 @@ namespace Infrastructure.StateMachine
 {
     public class OnStartState : IState
     {
-        public OnStartState(GameStateMachine gameStateMachine, Container container)
+        private GameManager _gameManager;
+
+        public OnStartState(GameStateMachine gameStateMachine, Container container, GameManager gameManager)
         {
-        
+            _gameManager = gameManager;
         }
     
         public void Enter()
         {
-            throw new NotImplementedException();
+            _gameManager.StartConfigure();
         }
 
         public void Exit()
         {
-            throw new NotImplementedException();
+            
         }
     }
 }

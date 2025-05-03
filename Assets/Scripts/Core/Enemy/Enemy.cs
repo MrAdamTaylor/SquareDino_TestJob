@@ -1,3 +1,4 @@
+using System;
 using Core.Configs;
 using Core.UI;
 using Infrastructure.DI.Injector;
@@ -8,25 +9,34 @@ namespace Core.Enemy
     public class Enemy : MonoBehaviour, IDamagable
     {
         [SerializeField] private HealthView _healthView;
-    
+        [SerializeField] Rigidbody _mainBone;
+        
+        public event Action<Enemy> OnDeath; 
+        private RagdollHandler _ragdollHandler;
+
         private Animator _animator;
         private HealthController _healthController;
-        private RagdollHandler _ragdollHandler;
-    
+        private Transform _playerTransform;
+        
+        
         [Inject]
-        public void Construct(Health health,RagdollHandler ragdollHandler, EnemyConfig enemyConfig)
+        public void Construct(Health health,RagdollHandler ragdollHandler, EnemyConfig enemyConfig, Player.Player player)
         {
+            _playerTransform = player.transform;
             _animator = GetComponent<Animator>();
             health.Construct(enemyConfig.Health);
             _healthController = new HealthController(health, _healthView, Kill);
             _ragdollHandler = ragdollHandler;
-            _ragdollHandler.Initialize(GetComponentsInChildren<Rigidbody>());
+            _ragdollHandler.Initialize(GetComponentsInChildren<Rigidbody>(), _mainBone, transform, enemyConfig.ThrowForce);
         }
 
         private void Kill()
         {
             _animator.enabled = false;
             _ragdollHandler.Enable();
+            _ragdollHandler.ThrowRagdoll(_playerTransform);
+            
+            OnDeath?.Invoke(this);
         }
 
         public void TakeDamage(int damage)

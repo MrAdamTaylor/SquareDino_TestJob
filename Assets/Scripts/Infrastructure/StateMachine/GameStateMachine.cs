@@ -8,13 +8,13 @@ namespace Infrastructure.StateMachine
     {
         private Dictionary<Type, IState> _states;
         private IState _activeState;
-        public GameStateMachine(Container container)
+        public GameStateMachine(Container container, GameManager gameManager)
         {
             _states = new Dictionary<Type, IState>
             {
-                [typeof(InitState)] = new InitState(this, container),
-                [typeof(OnStartState)] = new OnStartState(this, container),
-                [typeof(GameLoopState)] = new GameLoopState()
+                [typeof(InitState)] = new InitState(this, container, gameManager),
+                [typeof(OnStartState)] = new OnStartState(this, container, gameManager),
+                [typeof(GameLoopState)] = new GameLoopState(this, gameManager)
             };
         }
     

@@ -6,5 +6,8 @@ namespace Core.Configs
     public class EnemyConfig : ScriptableObject
     {
         public int Health;
+        
+        
+        public float ThrowForce;
     }
 }

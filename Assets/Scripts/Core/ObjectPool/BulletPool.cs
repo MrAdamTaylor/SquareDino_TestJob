@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Core.ObjectPool
@@ -44,14 +45,16 @@ namespace Core.ObjectPool
             _pool = new GameObjectPool(factory, totalCount);
         }
 
-        public void SpawnAtPositions(int count, Transform[] spawnPoints)
+        public List<GameObject> SpawnAtPositions(int count, Transform[] spawnPoints)
         {
+            List<GameObject> spawnedEnemies = new();
+
             for (int i = 0; i < count; i++)
             {
                 if (_pool.PoolCount <= 0)
                 {
                     Debug.Log("<color=red>Pool exhausted</color>");
-                    return;
+                    break; // используем break вместо return, чтобы вернуть уже заспавненных
                 }
 
                 GameObject enemy = _pool.Get();
@@ -59,7 +62,11 @@ namespace Core.ObjectPool
 
                 enemy.transform.position = point.position;
                 enemy.transform.rotation = point.rotation;
+
+                spawnedEnemies.Add(enemy);
             }
+
+            return spawnedEnemies;
         }
 
         public void Return(GameObject enemy)

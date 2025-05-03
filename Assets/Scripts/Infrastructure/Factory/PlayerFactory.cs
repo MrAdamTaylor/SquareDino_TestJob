@@ -26,6 +26,7 @@ namespace Infrastructure.Factory
             _container.Construct(mouseInputSystem);
             _container.CacheType(mouseInputSystem.GetType(), mouseInputSystem);
             _container.Construct(playerComponent);
+            _container.CacheMono(playerComponent.GetType(), playerComponent);
             return instance;
         }
     }
