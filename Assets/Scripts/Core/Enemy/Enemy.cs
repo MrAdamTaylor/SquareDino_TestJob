@@ -43,5 +43,12 @@ namespace Core.Enemy
         {
             _healthController.TakeDamage(damage);
         }
+
+        public void Recovery()
+        {
+            _healthController.RestoreHealth();
+            _ragdollHandler.Disable();
+            _animator.enabled = true;
+        }
     }
 }

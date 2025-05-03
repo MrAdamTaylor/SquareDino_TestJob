@@ -21,5 +21,10 @@ namespace Core.Enemy
         }
 
         public float Normalized => (float)_current / _max;
+
+        public void RestoreHealth()
+        {
+            _current = _max;
+        }
     }
 }

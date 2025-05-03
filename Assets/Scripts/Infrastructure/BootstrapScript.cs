@@ -18,6 +18,11 @@ namespace Infrastructure
         [SerializeField] private Camera _camera;
         [SerializeField] private List<Transform> _waypoints;
     
+        [Header("StartPoint")]
+        [SerializeField] private Transform _startPoint;
+        [Header("FinishPoint")]
+        [SerializeField] private Transform _endPoint;
+        
         public void Start()
         {
             var container = new Container();
@@ -52,5 +57,7 @@ namespace Infrastructure
             var gameAppController = gameObject.AddComponent<GameAppController>();
             gameAppController.Init(container);
         }
+        
+        
     }
 }

@@ -9,6 +9,8 @@ namespace Infrastructure
         private GameStateMachine _gameStateMachine;
         public void Init(Container container)
         {
+            GameManager gameManager = new GameManager();
+            
             _gameStateMachine = new GameStateMachine(container, new GameManager());
             _gameStateMachine.Enter<InitState>();
         

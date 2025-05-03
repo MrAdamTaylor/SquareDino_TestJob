@@ -27,5 +27,11 @@ namespace Core.UI
             if (_health.Normalized <= 0f)
                 _onDeath?.Invoke();
         }
+
+        public void RestoreHealth()
+        {
+            _health.RestoreHealth();
+            _view.SetValue(_health.Normalized);
+        }
     }
 }

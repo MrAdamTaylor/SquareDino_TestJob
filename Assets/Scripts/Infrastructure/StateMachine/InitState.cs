@@ -92,6 +92,7 @@ namespace Infrastructure.StateMachine
         
         private List<GameObject> _ragdollEnemiesList = new();
         private List<Enemy> _activeEnemies = new();
+        private List<GameObject> _oldRagdollEnemiesList = new();
 
         public void SpawnEnemies(Transform[] enemiesPoints)
         {
@@ -103,6 +104,41 @@ namespace Infrastructure.StateMachine
             }
         }
 
+        public void OnTaskCompleted(int stepNumber)
+        {
+            if (stepNumber < 2)
+            {
+                Debug.Log("<color=orange>Just collecting ragdolls</color>");
+                return; // Ничего не делаем
+            }
+
+            Debug.Log("<color=orange>Rotating ragdolls, cleaning up</color>");
+
+            // 1. Деспавним старых
+            for (int i = 0; i < _oldRagdollEnemiesList.Count; i++)
+            {
+                ReturnEnemyInPool(_oldRagdollEnemiesList[i]);
+            }
+            _oldRagdollEnemiesList.Clear();
+
+            // 2. Переносим новых в старые
+            _oldRagdollEnemiesList = new List<GameObject>(_ragdollEnemiesList);
+
+            // 3. Очищаем текущий
+            _ragdollEnemiesList.Clear();
+        }
+
+        private void ReturnEnemyInPool(GameObject enemyObject)
+        {
+            if (enemyObject.TryGetComponent(out Enemy enemy))
+            {
+                enemy.OnDeath -= HandleEnemyDeath;
+                enemy.Recovery();
+            }
+
+            _enemyPool.Return(enemyObject);
+        }
+
         public void DespawnKilledEnemies()
         {
             if(_ragdollEnemiesList.Count <= 0)
@@ -111,10 +147,7 @@ namespace Infrastructure.StateMachine
             
             for (int i = 0; i < _ragdollEnemiesList.Count; i++)
             {
-                if (_ragdollEnemiesList[i].TryGetComponent(out Enemy enemy))
-                {
-                    enemy.OnDeath -= HandleEnemyDeath;
-                }
+                ReturnEnemyInPool(_ragdollEnemiesList[i]);
                 
                 _enemyPool.Return(_ragdollEnemiesList[i]);
             }
@@ -140,6 +173,8 @@ namespace Infrastructure.StateMachine
 
     public class GameManager
     {
+        private int _completedSteps = 0;
+        
         [Inject] private EnemyManager _enemyManager;
         [Inject] private List<(Transform,GameTask)> _gameTasks;
         [Inject] private MouseInputSystem _mouseInputSystem;
@@ -194,15 +229,19 @@ namespace Infrastructure.StateMachine
         
         private void NextStep()
         {
-            _currentTask.OnCompleted -= NextStep; 
-            /*if(_gameTasks.Count - _tasks.Count > 1)
-                _enemyManager.DespawnKilledEnemies();*/
+            _currentTask.OnCompleted -= NextStep;
+
+            _completedSteps++;
+            
+            if(_gameTasks.Count - _tasks.Count > 1)
+                _enemyManager.OnTaskCompleted(_completedSteps);
             AssignNextTask();
             
         }
 
         public void StartConfigure()
         {
+            _completedSteps = 0;
             _enemyManager.DespawnKilledEnemies();
             //_enemyManager.SpawnEnemies(_gameTasks[0].Item2.GetPositions());
 
