@@ -8,10 +8,9 @@ namespace Core.GameControll
 {
     public class GameTaskCreator
     {
-        private const int ACTIVE_TASK_COUNT = 3;
-        
-        //NOTE With strict calculation, sometimes during a repeated game a bug occurs, in which a dead enemy spawns
-        private const int ADDITIONAL_RALIABILITY = 2; 
+        //NOTE How many hypothetical rounds should the pool be reserved for?
+        //NOTE If there is no progression in the game (there are no more opponents), it is recommended to bet 3
+        private const int ACTIVE_TASK_COUNT = 2;
     
         private List<Transform> _waypoints = new();
         private Container _container;
@@ -92,7 +91,7 @@ namespace Core.GameControll
                     maxSum = windowSum;
             }
 
-            return maxSum + ADDITIONAL_RALIABILITY;
+            return maxSum;
         }
     }
 }
