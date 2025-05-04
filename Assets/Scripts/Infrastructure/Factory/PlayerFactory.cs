@@ -22,9 +22,12 @@ namespace Infrastructure.Factory
 
             var instance = GameObject.Instantiate(prefab, position, Quaternion.Euler(0,180,0), parent);
             var playerComponent = instance.GetComponent<Player>();
-            PlayerMouseControl playerMouseControl = new();
+            PlayerMouseControl playerMouseControl = instance.AddComponent<PlayerMouseControl>();
             _container.Construct(playerMouseControl);
-            _container.CacheType(playerMouseControl.GetType(), playerMouseControl);
+            _container.CacheMono(playerMouseControl.GetType(), playerMouseControl);
+            BulletShoot bulletShoot = new();
+            _container.Construct(bulletShoot);
+            _container.CacheType(bulletShoot.GetType(), bulletShoot);
             _container.Construct(playerComponent);
             _container.CacheMono(playerComponent.GetType(), playerComponent);
             return instance;

@@ -5,21 +5,23 @@ using UnityEngine;
 
 namespace Core.Player
 {
-    public class PlayerMouseControl 
+    public class PlayerMouseControl : MonoBehaviour
     {
         private Camera _camera;
-        private BulletPool _bulletPool;
+        //private BulletPool _bulletPool;
         private bool _isEnabled;
+        private BulletShoot _bulletShoot;
 
         public event Action OnFirstClick;
+        public event Action OnClick;
         
         private bool _firstClickProcessed = false;
 
         [Inject]
-        public void Construct(Camera camera, BulletPool bulletPool)
+        public void Construct(Camera cameral)
         {
-            _camera = camera;
-            _bulletPool = bulletPool;
+            _camera = GetComponent<Camera>();
+            //_bulletPool = bulletPool;
             _isEnabled = true;
         }
 
@@ -31,7 +33,7 @@ namespace Core.Player
             _firstClickProcessed = false;
         }
 
-        public void Tick()
+        public void Update()
         {
             if (!_isEnabled)
                 return;
@@ -46,9 +48,7 @@ namespace Core.Player
                 return;
             }
 
-            Vector3 screenPos = Input.mousePosition;
-            Ray ray = _camera.ScreenPointToRay(screenPos);
-            _bulletPool.Spawn(_camera.transform.position, Quaternion.LookRotation( ray.direction ));
+            OnClick?.Invoke();
         }
     }
 }

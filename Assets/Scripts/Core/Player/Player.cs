@@ -34,12 +34,6 @@ namespace Core.Player
             _isConstruct = true;
         }
 
-        private void Update()
-        {
-            if(_isConstruct)
-                _playerMouseControl.Tick();
-        }
-
         public void ConfigureBeforeStart()
         {
             if (!_navMeshAgent.enabled) 
