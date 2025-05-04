@@ -1,5 +1,6 @@
 using Core.Configs;
 using Core.Enemy;
+using Core.UI;
 using Infrastructure.DI.Container;
 using Infrastructure.DI.Injector;
 using UnityEngine;
@@ -20,6 +21,9 @@ namespace Infrastructure.Factory
             if (prefab == null)
                 return null;
 
+            HealthController healthController = new();
+            _container.Construct(healthController);
+            _container.CacheType(healthController.GetType(), healthController);
             var instance = GameObject.Instantiate(prefab, position, Quaternion.identity, parent);
             var enemyComponent = instance.GetComponent<Enemy>();
             _container.Construct(enemyComponent);

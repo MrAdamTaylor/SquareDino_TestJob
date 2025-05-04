@@ -22,9 +22,9 @@ namespace Core.Other
 
             for (int i = 0; i < colliders.Length; i++)
             {
-                string tag = colliders[i].tag;
-                if (_tags.Contains(tag))
-                    results.Add((tag, colliders[i].transform));
+                string tagInList = colliders[i].tag;
+                if (_tags.Contains(tagInList))
+                    results.Add((tagInList, colliders[i].transform));
             }
 
             return results;

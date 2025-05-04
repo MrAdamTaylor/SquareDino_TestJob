@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Cinemachine;
 using Core.Configs;
 using Core.Enemy;
-using Core.GameControll;
+using Core.GameControl;
 using Infrastructure.DI.Container;
 using Infrastructure.DI.Model;
 using Infrastructure.Factory;

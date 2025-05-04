@@ -4,7 +4,7 @@ using Infrastructure.DI.Container;
 using Infrastructure.DI.Injector;
 using UnityEngine;
 
-namespace Core.GameControll
+namespace Core.GameControl
 {
     public class GameTaskCreator
     {

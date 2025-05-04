@@ -5,10 +5,10 @@ using UnityEngine;
 
 namespace Core.Player
 {
-    public class MouseInputSystem 
+    public class PlayerMouseControl 
     {
         private Camera _camera;
-        private  BulletPool _bulletPool;
+        private BulletPool _bulletPool;
         private bool _isEnabled;
 
         public event Action OnFirstClick;
@@ -43,7 +43,6 @@ namespace Core.Player
             {
                 _firstClickProcessed = true;
                 OnFirstClick?.Invoke();
-                OnFirstClick = null;
                 return;
             }
 

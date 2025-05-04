@@ -6,13 +6,13 @@ using Infrastructure.DI.Injector;
 using Infrastructure.StateMachine;
 using UnityEngine;
 
-namespace Core.GameControll
+namespace Core.GameControl
 {
     public class GameManager
     {
         [Inject] private EnemyManager _enemyManager;
         [Inject] private List<(Transform,GameTask)> _gameTasks;
-        [Inject] private MouseInputSystem _mouseInputSystem;
+        [Inject] private PlayerMouseControl _playerMouseControl;
         [Inject] private Player.Player _player;
 
         public Transform StartPoint { get; }
@@ -25,24 +25,20 @@ namespace Core.GameControll
         private GameTask _currentTask;
         private LevelReloaderTrigger _levelReloaderTrigger;
 
-        public GameManager(Transform startPoint, LevelReloaderTrigger levelReloaderTrigger)
+        public GameManager(GameStateMachine gameStateMachine,Transform startPoint, LevelReloaderTrigger levelReloaderTrigger)
         {
+            _gameStateMachine = gameStateMachine;
             StartPoint = startPoint;
             _levelReloaderTrigger = levelReloaderTrigger;
             _levelReloaderTrigger.Construct(this);
         }
 
-        public void Construct(GameStateMachine gameStateMachine)
-        {
-            _gameStateMachine = gameStateMachine;
-        }
-
         public void StartConfigure()
         {
             _enemyManager.ReloadAllEnemies();
-            _mouseInputSystem.Enable();
-            _mouseInputSystem.StartConfigure();
-            _mouseInputSystem.OnFirstClick += EnterGameLoop;
+            _playerMouseControl.Enable();
+            _playerMouseControl.StartConfigure();
+            _playerMouseControl.OnFirstClick += EnterGameLoop;
             _player.ConfigureBeforeStart();
             _isFinished = false;
         }
@@ -105,7 +101,7 @@ namespace Core.GameControll
 
         private void EnterGameLoop()
         {
-            _mouseInputSystem.OnFirstClick -= EnterGameLoop;
+            _playerMouseControl.OnFirstClick -= EnterGameLoop;
             _gameStateMachine.Enter<GameLoopState>();
         }
     }

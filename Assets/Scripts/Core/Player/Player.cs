@@ -12,20 +12,17 @@ namespace Core.Player
     {
         static readonly int IsRun = Animator.StringToHash( "IsRun" );
     
-        [SerializeField] private CinemachineFreeLook _freeLockCamera;
-        
+        private CinemachineFreeLook _freeLockCamera;
         private List<Transform> _waypoints;
         private NavMeshAgent _navMeshAgent;
         private Animator _animator;
     
-        private MouseInputSystem _mouseInputSystem;
-
-        private bool _canMove;
-        private bool _isMoving = true;
+        private PlayerMouseControl _playerMouseControl;
+        
         private bool _isConstruct;
     
         [Inject]
-        public void Construct(CinemachineFreeLook virtualCamera, MouseInputSystem mouseInputSystem, PlayerConfig playerConfig)
+        public void Construct(CinemachineFreeLook virtualCamera, PlayerMouseControl playerMouseControl, PlayerConfig playerConfig)
         {
             _freeLockCamera = virtualCamera;
             _freeLockCamera.Follow = transform;
@@ -33,16 +30,14 @@ namespace Core.Player
             _navMeshAgent = GetComponent<NavMeshAgent>();
             _navMeshAgent.speed = playerConfig.Speed;
             _animator = GetComponent<Animator>();
-            _mouseInputSystem = mouseInputSystem;
-            _canMove = true;
-            _isMoving = false;
+            _playerMouseControl = playerMouseControl;
             _isConstruct = true;
         }
 
         private void Update()
         {
             if(_isConstruct)
-                _mouseInputSystem.Tick();
+                _playerMouseControl.Tick();
         }
 
         public void ConfigureBeforeStart()
@@ -53,9 +48,7 @@ namespace Core.Player
 
         public void TryMoveToNextWaypoint(Transform point)
         {
-            _isMoving = true;
-            _canMove = false;
-            _mouseInputSystem.Disable();
+            _playerMouseControl.Disable();
             _animator.SetBool( IsRun, true );
 
             Transform target = point;
@@ -74,9 +67,7 @@ namespace Core.Player
             StopAllCoroutines();
             
             _animator.SetBool(IsRun, false);
-            _isMoving = false;
-            _canMove = false;
-            _mouseInputSystem.Disable();
+            _playerMouseControl.Disable();
         }
 
         private IEnumerator WaitForArrival()
@@ -85,9 +76,8 @@ namespace Core.Player
             {
                 yield return null;
             }
-
-            _isMoving = false;
-            _mouseInputSystem.Enable();
+            
+            _playerMouseControl.Enable();
             _animator.SetBool( IsRun, false );
         }
     }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.GameControll
+namespace Core.GameControl
 {
     public class LevelReloaderTrigger : MonoBehaviour
     {

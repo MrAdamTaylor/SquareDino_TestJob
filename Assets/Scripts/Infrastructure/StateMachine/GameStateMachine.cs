@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Core.GameControll;
+using Core.GameControl;
 using Infrastructure.Bootstrap;
 using Infrastructure.DI.Container;
+using UnityEngine;
 
 namespace Infrastructure.StateMachine
 {
@@ -10,8 +11,10 @@ namespace Infrastructure.StateMachine
     {
         private Dictionary<Type, IState> _states;
         private IState _activeState;
-        public GameStateMachine(Container container, GameManager gameManager)
+        public GameStateMachine(Container container, Transform startPoint, LevelReloaderTrigger levelReloaderTrigger)
         {
+            GameManager gameManager = new GameManager(this, startPoint, levelReloaderTrigger);
+            
             _states = new Dictionary<Type, IState>
             {
                 [typeof(InitState)] = new InitState(this, container, gameManager),

@@ -2770,6 +2770,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _healthView: {fileID: 2334190378746631302}
   _mainBone: {fileID: 3861612154748369444}
+  _animator: {fileID: 3722870907485989301}
 --- !u!95 &3722870907485989301
 Animator:
   serializedVersion: 5

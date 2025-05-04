@@ -1,5 +1,5 @@
 using System;
-using Core.GameControll;
+using Core.GameControl;
 using Infrastructure.Bootstrap;
 using UnityEngine;
 

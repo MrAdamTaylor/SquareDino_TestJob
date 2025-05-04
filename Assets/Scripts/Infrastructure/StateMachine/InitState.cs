@@ -1,5 +1,5 @@
 using Core.Enemy;
-using Core.GameControll;
+using Core.GameControl;
 using Core.ObjectPool;
 using Infrastructure.Bootstrap;
 using Infrastructure.DI.Container;
@@ -10,6 +10,8 @@ namespace Infrastructure.StateMachine
 {
     public class InitState : IState
     {
+        private const string PARENT_OBJECT_NAME = "[GameObjects]";
+        
         private readonly IFactory _enemyFactory;
         private readonly IFactory _playerFactory;
         private readonly IFactory _bulletFactory;
@@ -21,7 +23,6 @@ namespace Infrastructure.StateMachine
         {
             _gameStateMachine = gameStateMachine;
             _gameManager = gameManager;
-            _gameManager.Construct(_gameStateMachine);
             _container = container;
             var scope = container.CreateScope();
             _enemyFactory = (IFactory)scope.Resolve(typeof(EnemyFactory));
@@ -43,7 +44,7 @@ namespace Infrastructure.StateMachine
             _container.Construct(creator);
             creator.GenerateGameTask();
 
-            GameObject parent = GameObject.Find("[GameObjects]");
+            GameObject parent = GameObject.Find(PARENT_OBJECT_NAME);
             
             _playerFactory.Create(_gameManager.StartPoint.position, parent.transform);
             

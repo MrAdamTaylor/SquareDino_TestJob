@@ -13,6 +13,7 @@ namespace Core.Enemy
         
         private readonly List<GameObject> _ragdollEnemiesList = new();
         private readonly List<Enemy> _activeEnemies = new();
+        
         private List<GameObject> _oldRagdollEnemiesList = new();
 
         public void SpawnEnemies(Transform[] enemiesPoints)

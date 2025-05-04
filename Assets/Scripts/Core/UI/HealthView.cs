@@ -23,8 +23,11 @@ namespace Core.UI
         
         private void Update()
         {
-            Quaternion rotation = _mainCamera.transform.rotation;
-            transform.LookAt(transform.position + rotation * Vector3.back, rotation * Vector3.up);
+            if (_isConstructed)
+            {
+                Quaternion rotation = _mainCamera.transform.rotation;
+                transform.LookAt(transform.position + rotation * Vector3.back, rotation * Vector3.up);
+            }
         }
     }
 }

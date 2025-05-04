@@ -1,22 +1,30 @@
 using System;
+using Core.Configs;
 using Core.Enemy;
+using Infrastructure.DI.Injector;
 using UnityEngine;
 
 namespace Core.UI
 {
     public class HealthController
     {
-        private readonly Health _health;
-        private readonly HealthView _view;
-        private readonly Action _onDeath;
-
-        public HealthController(Health health, HealthView view, Camera camera, Action onDeath = null)
+        [Inject] private Camera _camera;
+        [Inject] private  Health _health;
+        
+        private HealthView _view;
+        private Action _onDeath;
+        
+        public void Construct(HealthView healthView, EnemyConfig enemyConfig)
         {
-            _health = health;
-            _view = view;
-            _onDeath = onDeath;
-            _view.Construct(camera);
+            _health.Construct(enemyConfig.Health);
+            _view = healthView;
+            _view.Construct(_camera);
             _view.SetValue(_health.Normalized);
+        }
+
+        public void SubscribeToDeath(Action onDeath)
+        {
+            _onDeath = onDeath;
         }
 
         public void TakeDamage(int damage)

@@ -1,4 +1,4 @@
-using Core.GameControll;
+using Core.GameControl;
 using Infrastructure.DI.Container;
 using Infrastructure.StateMachine;
 using UnityEngine;
@@ -10,8 +10,7 @@ namespace Infrastructure.Bootstrap
         private GameStateMachine _gameStateMachine;
         public void Init(Container container, Transform startPoint, LevelReloaderTrigger levelReloaderTrigger)
         {
-            GameManager gameManager = new GameManager(startPoint, levelReloaderTrigger);
-            _gameStateMachine = new GameStateMachine(container, gameManager);
+            _gameStateMachine = new GameStateMachine(container, startPoint, levelReloaderTrigger);
             _gameStateMachine.Enter<InitState>();
         
         }

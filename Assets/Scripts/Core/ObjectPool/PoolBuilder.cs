@@ -30,7 +30,7 @@ namespace Core.ObjectPool
 
         public void ConfigurePools(int enemiesCount)
         {
-            _bulletPool.Construct(_bulletConfig.bulletCountsInPool, ()=> _bulletFactory.Create(Vector3.zero, _globalParent));
+            _bulletPool.Construct(_bulletConfig.BulletCountsInPool, ()=> _bulletFactory.Create(Vector3.zero, _globalParent));
             _enemyPool.Construct(enemiesCount, ()=> _enemyFactory.Create(Vector3.zero, _globalParent));
         }
     }

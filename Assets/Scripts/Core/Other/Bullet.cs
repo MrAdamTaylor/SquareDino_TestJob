@@ -44,14 +44,14 @@ namespace Core.Other
         {
             if (_isConstructed)
             {
-                float deltaPos = _config.bulletSpeed * Time.deltaTime;
+                float deltaPos = _config.BulletSpeed * Time.deltaTime;
                 Collider collider = Raycast(deltaPos);
             
                 if ( collider != null )
                 {
-                    IDamagable damagable = collider.GetComponentInParent<IDamagable>();
+                    IDamageable damageable = collider.GetComponentInParent<IDamageable>();
 
-                    damagable?.TakeDamage( _config.bulletDamage );
+                    damageable?.TakeDamage( _config.BulletDamage );
 
                     _bulletPool.Return( gameObject );
                 }
@@ -79,7 +79,7 @@ namespace Core.Other
     
         private IEnumerator Lifetime_Cor()
         {
-            yield return new WaitForSeconds( _config.bulletLifeTime );
+            yield return new WaitForSeconds( _config.BulletLifeTime );
 
             _bulletPool.Return( gameObject );
         }

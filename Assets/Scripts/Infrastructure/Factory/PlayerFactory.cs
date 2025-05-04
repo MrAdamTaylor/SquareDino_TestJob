@@ -22,9 +22,9 @@ namespace Infrastructure.Factory
 
             var instance = GameObject.Instantiate(prefab, position, Quaternion.Euler(0,180,0), parent);
             var playerComponent = instance.GetComponent<Player>();
-            MouseInputSystem mouseInputSystem = new();
-            _container.Construct(mouseInputSystem);
-            _container.CacheType(mouseInputSystem.GetType(), mouseInputSystem);
+            PlayerMouseControl playerMouseControl = new();
+            _container.Construct(playerMouseControl);
+            _container.CacheType(playerMouseControl.GetType(), playerMouseControl);
             _container.Construct(playerComponent);
             _container.CacheMono(playerComponent.GetType(), playerComponent);
             return instance;

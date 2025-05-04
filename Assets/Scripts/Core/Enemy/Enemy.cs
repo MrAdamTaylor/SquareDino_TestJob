@@ -6,17 +6,17 @@ using UnityEngine;
 
 namespace Core.Enemy
 {
-    public class Enemy : MonoBehaviour, IDamagable
+    public class Enemy : MonoBehaviour, IDamageable
     {
         [SerializeField] private HealthView _healthView;
-        [SerializeField] Rigidbody _mainBone;
+        [SerializeField] private Rigidbody _mainBone;
+        [SerializeField] private Animator _animator;
         
         public bool IsDeath => _isDeath;
         
         public event Action<Enemy> OnDeath; 
         
         private RagdollHandler _ragdollHandler;
-        private Animator _animator;
         private HealthController _healthController;
         private Transform _playerTransform;
         
@@ -24,12 +24,12 @@ namespace Core.Enemy
 
 
         [Inject]
-        public void Construct(Health health,RagdollHandler ragdollHandler, EnemyConfig enemyConfig, Player.Player player, Camera camera)
+        public void Construct(HealthController healthController,RagdollHandler ragdollHandler, EnemyConfig enemyConfig, Player.Player player)
         {
             _playerTransform = player.transform;
-            _animator = GetComponent<Animator>();
-            health.Construct(enemyConfig.Health);
-            _healthController = new HealthController(health, _healthView, camera, Kill);
+            _healthController = healthController;
+            _healthController.Construct(_healthView, enemyConfig);
+            _healthController.SubscribeToDeath(Kill);
             _ragdollHandler = ragdollHandler;
             _ragdollHandler.Initialize(GetComponentsInChildren<Rigidbody>(), _mainBone, transform, enemyConfig.ThrowForce);
             _isDeath = false;

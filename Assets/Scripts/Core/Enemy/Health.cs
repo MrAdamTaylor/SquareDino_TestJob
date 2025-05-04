@@ -5,10 +5,11 @@ namespace Core.Enemy
 {
     public class Health 
     {
+        public float Normalized => (float)_current / _max;
+        
         private int _current;
         private int _max;
 
-        public float Normalized => (float)_current / _max;
 
         public void Construct(int max)
         {
