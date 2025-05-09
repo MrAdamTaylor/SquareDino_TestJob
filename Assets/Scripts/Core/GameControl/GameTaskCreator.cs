@@ -23,6 +23,50 @@ namespace Core.GameControl
             _waypoints = waypoints;
         }
 
+        public List<GameTask[]> GenerateTasksForMultiplePaths(List<List<Transform>> paths)
+        {
+            List<GameTask[]> result = new();
+
+            foreach (var path in paths)
+            {
+                List<GameTask> taskList = new();
+        
+                for (int i = 0; i < path.Count; i++)
+                {
+                    TagRadiusDetector detector;
+                    if (!path[i].TryGetComponent(out detector))
+                    {
+                        detector = path[i].GetComponent<TagRadiusDetector>();
+                        if (detector != null)
+                            UnityEngine.Object.Destroy(detector);
+                        continue;
+                    }
+
+                    var waypointInfo = detector.Scan();
+                    List<Transform> enemySpawnerTransforms = new();
+
+                    foreach (var info in waypointInfo)
+                    {
+                        if (info.tag == "EnemySpawner")
+                            enemySpawnerTransforms.Add(info.transform);
+                    }
+
+                    if (enemySpawnerTransforms.Count > 0)
+                    {
+                        var task = new GameTask(enemySpawnerTransforms);
+                        taskList.Add(task);
+                    }
+
+                    _container.CacheType(taskList.GetType(), taskList); // Кэшируем задачи конкретного пути
+                    UnityEngine.Object.Destroy(detector);
+                }
+
+                result.Add(taskList.ToArray());
+            }
+
+            return result;
+        }
+        
         public void GenerateGameTask()
         {
             for (int i = 0; i < _waypoints.Count; i++)

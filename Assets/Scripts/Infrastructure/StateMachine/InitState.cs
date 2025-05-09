@@ -18,9 +18,15 @@ namespace Infrastructure.StateMachine
         private readonly Container _container;
         private readonly GameManager _gameManager;
         private readonly GameStateMachine _gameStateMachine;
+        
+        private Transform _startPoint;
+        private Transform _endPoint;
     
-        public InitState(GameStateMachine gameStateMachine, Container container, GameManager gameManager)
+        public InitState(GameStateMachine gameStateMachine, Container container, GameManager gameManager, Transform startPoint, Transform endPoint)
         {
+            _startPoint = startPoint;
+            _endPoint = endPoint;
+            
             _gameStateMachine = gameStateMachine;
             _gameManager = gameManager;
             _container = container;
@@ -42,6 +48,10 @@ namespace Infrastructure.StateMachine
         {
             GameTaskCreator creator = new();
             _container.Construct(creator);
+
+            GraphCreator graphCreator = new GraphCreator(creator,_startPoint,_endPoint);
+            _container.Construct(graphCreator);
+            
             creator.GenerateGameTask();
 
             GameObject parent = GameObject.Find(PARENT_OBJECT_NAME);

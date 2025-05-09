@@ -17,7 +17,7 @@ namespace Infrastructure.StateMachine
             
             _states = new Dictionary<Type, IState>
             {
-                [typeof(InitState)] = new InitState(this, container, gameManager),
+                [typeof(InitState)] = new InitState(this, container, gameManager,startPoint, levelReloaderTrigger.gameObject.transform),
                 [typeof(OnStartState)] = new OnStartState( gameManager),
                 [typeof(GameLoopState)] = new GameLoopState( gameManager)
             };

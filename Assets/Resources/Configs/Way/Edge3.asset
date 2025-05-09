@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc9bdfd8d3edbca4eaa07726f1eca8c1, type: 3}
+  m_Name: Edge3
+  m_EditorClassIdentifier: 
+  NeighbourEdges:
+  - {fileID: 11400000, guid: e831c81fc16c62f4ca943a285dbf1442, type: 2}
+  Way:
+  - WaypointRight3
+  - WaypointRight4
+  - WaypointRight5
+  - WaypointRight6
+  - WaypointRight7
+  - WaypointRight8

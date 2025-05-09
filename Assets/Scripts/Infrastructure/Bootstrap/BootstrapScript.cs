@@ -24,6 +24,8 @@ namespace Infrastructure.Bootstrap
         [Header("FinishPoint")]
         [SerializeField] private LevelReloaderTrigger _levelReloaderTrigger;
         
+        [SerializeField] List<EdgeConfig> _edges;
+        
         public void Start()
         {
             var container = new Container();
@@ -54,7 +56,7 @@ namespace Infrastructure.Bootstrap
             }
             container.CreateScope();
         
-
+            container.CacheType(_edges.GetType(), _edges);
             GameAppController gameAppController = new();
             gameAppController.Init(container, _startPoint, _levelReloaderTrigger);
         }
